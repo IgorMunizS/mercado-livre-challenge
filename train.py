@@ -9,7 +9,7 @@ from utils import tokenize, embedding, focal_loss
 from sklearn.utils import class_weight
 
 
-def train(languages, EMBEDDING):
+def training(languages, EMBEDDING,train,test):
 
     for lang in languages:
         train_new = train[train["language"] == lang]
@@ -78,4 +78,4 @@ if __name__ == '__main__':
 
     languages = ['portuguese', 'spanish']
 
-    train(languages,EMBEDDING)
+    training(languages,EMBEDDING,train,test)
