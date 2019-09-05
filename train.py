@@ -30,13 +30,14 @@ def training(languages, EMBEDDING,train,test):
         maxlen = 30
         embed_size = 300
 
+        tok, X_train = tokenize(X_train,X_test,max_features,maxlen,lang)
+        embedding_matrix = embedding(tok,EMBEDDING[lang],max_features,embed_size)
+
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
         train_generator = DataGenerator(X_train, Y_train, classes, batch_size=4096)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=4096)
 
-        tok, X_train = tokenize(X_train,X_test,max_features,maxlen,lang)
-        embedding_matrix = embedding(tok,EMBEDDING[lang],max_features,embed_size)
 
         model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss=[focal_loss], optimizer=Adam(lr=1e-3), metrics=['accuracy'])
