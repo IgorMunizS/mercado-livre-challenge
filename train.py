@@ -35,7 +35,7 @@ def training(languages, EMBEDDING,train,test):
         train_generator = DataGenerator(X_train, Y_train, classes, batch_size=4096)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=4096)
 
-        X_train, tok = tokenize(X_train,X_test,max_features,maxlen,lang)
+        tok, X_train = tokenize(X_train,X_test,max_features,maxlen,lang)
         embedding_matrix = embedding(tok,EMBEDDING[lang],max_features,embed_size)
 
         model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
