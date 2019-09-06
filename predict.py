@@ -43,7 +43,7 @@ def predict(languages, pt_weight,es_weight,train,test,name):
             model_pred_class[i] = classes[value]
 
         test_new['category'] = model_pred_class
-        submission.append(test_new[['id','category']])
+        submission = submission.append(test_new[['id','category']])
 
 
     submission.to_csv('submissions/' + name + '.csv', index=False)
