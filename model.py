@@ -11,11 +11,19 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     x1 = SpatialDropout1D(0.2)(x)
 
-    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(x1)
+    x = Bidirectional(CuDNNGRU(512, return_sequences=True))(x1)
+
+    x = Conv1D(128, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+
+    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(x)
 
     x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
-    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x1)
+    y = Bidirectional(CuDNNLSTM(512, return_sequences=True))(x1)
+
+    y = Conv1D(128, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
+
+    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(y)
 
     y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
 
