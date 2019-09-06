@@ -45,7 +45,7 @@ def training(languages, EMBEDDING,train,test):
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
                                      save_weights_only=False)
-        early = EarlyStopping(monitor="val_acc", mode="max", patience=2)
+        early = EarlyStopping(monitor="val_loss", mode="max", patience=2)
 
         reduce_lr = ReduceLROnPlateau(
                         monitor  = 'val_loss',
