@@ -1,6 +1,5 @@
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 import pandas as pd
 import argparse
 import sys
@@ -58,16 +57,9 @@ def parse_args(args):
     parser.add_argument('--pt_weight', help='Path to portuguese weight')
     parser.add_argument('--es_weight', help='Path to spanish weight')
     parser.add_argument('--name', help="Name of csv submission", default="submission")
+    parser.add_argument("--cpu", default=False, type=bool)
 
     return parser.parse_args(args)
-
-
-def main(args=None):
-    # parse arguments
-
-
-    cocoeval = CocoEval(args.backbone)
-    cocoeval.coco_eval(args.coco_dir, args.dataset)
 
 
 if __name__ == '__main__':
@@ -79,8 +71,11 @@ if __name__ == '__main__':
 
     languages = ['portuguese', 'spanish']
 
-
     args = sys.argv[1:]
     args = parse_args(args)
+
+    if args.cpu:
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
     predict(languages,args.pt_weight,args.es_weight,train,test,args.name)
