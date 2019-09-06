@@ -7,6 +7,7 @@ from generator import DataGenerator
 from model import get_model
 from utils import tokenize, embedding, focal_loss
 from sklearn.utils import class_weight
+from keras_radam import RAdam
 
 
 def training(languages, EMBEDDING,train,test):
@@ -38,9 +39,10 @@ def training(languages, EMBEDDING,train,test):
         train_generator = DataGenerator(X_train, Y_train, classes, batch_size=4096)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=4096)
 
+        opt = RAdam(lr=1e-3, min_lr=1e-5)
 
         model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
-        model.compile(loss=[focal_loss], optimizer=Adam(lr=1e-3), metrics=['accuracy'])
+        model.compile(loss=[focal_loss], optimizer=opt, metrics=['accuracy'])
 
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
@@ -49,8 +51,8 @@ def training(languages, EMBEDDING,train,test):
 
         reduce_lr = ReduceLROnPlateau(
                         monitor  = 'val_loss',
-                        factor   = 0.1,
-                        patience = 1,
+                        factor   = 0.3,
+                        patience = 2,
                         verbose  = 1,
                         mode     = 'auto',
                         epsilon  = 0.0001,
@@ -75,7 +77,7 @@ if __name__ == '__main__':
     test = pd.read_csv("../../dados/test.csv")
 
     EMBEDDING = {"spanish": "../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec",
-                 "portuguese": "../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec"}
+                 "portuguese": "../../../harold/word_embeddings/portugues/glove_s300.txt"}
 
     languages = ['portuguese', 'spanish']
 
