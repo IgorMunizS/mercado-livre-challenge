@@ -4,13 +4,15 @@ from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 
 from generator import DataGenerator
-from model import get_model
+from model import get_model, get_small_model
 from utils import tokenize, embedding, focal_loss
 from sklearn.utils import class_weight
 from keras_radam import RAdam
+import argparse
+import sys
 
 
-def training(languages, EMBEDDING,train,test):
+def training(languages, EMBEDDING,train,test,env):
 
     for lang in languages:
         train_new = train[train["language"] == lang]
@@ -41,7 +43,10 @@ def training(languages, EMBEDDING,train,test):
 
         opt = RAdam(lr=1e-3, min_lr=1e-5)
 
-        model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
+        if env == 'colab':
+            model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+        else:
+            model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss=[focal_loss], optimizer=opt, metrics=['accuracy'])
 
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
@@ -72,6 +77,17 @@ def training(languages, EMBEDDING,train,test):
                             use_multiprocessing=True,
                             workers=42)
 
+def parse_args(args):
+    """ Parse the arguments.
+    """
+    parser = argparse.ArgumentParser(description='Predict script')
+
+
+    parser.add_argument('--env', help='Local of training', default='v100')
+
+
+    return parser.parse_args(args)
+
 if __name__ == '__main__':
     train = pd.read_csv("../../dados/train.csv")
     test = pd.read_csv("../../dados/test.csv")
@@ -81,4 +97,7 @@ if __name__ == '__main__':
 
     languages = ['portuguese', 'spanish']
 
-    training(languages,EMBEDDING,train,test)
+    args = sys.argv[1:]
+    args = parse_args(args)
+
+    training(languages,EMBEDDING,train,test,args.env)
