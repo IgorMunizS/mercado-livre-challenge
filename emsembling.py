@@ -7,6 +7,7 @@ import argparse
 def emsemble(folder):
 
     predictions = [f for f in os.listdir(folder) if os.path.isfile(f)]
+    print(predictions)
     train = pd.read_csv("../../dados/train.csv")
     test = pd.read_csv("../../dados/test.csv")
 
@@ -23,6 +24,7 @@ def emsemble(folder):
         classes = train_new["category"].unique()
 
         for predict in predictions:
+            print(predict)
             if predict.split('.')[1] == 'pickle':
                 lang = predict.split('_')[0]
                 val_acc = predict.split('_')[1]
