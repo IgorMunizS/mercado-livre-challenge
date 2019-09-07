@@ -32,12 +32,20 @@ def predict(languages, pt_weight,es_weight,train,test,name):
 
         if lang == 'portuguese':
             model_path = pt_weight
+            val_acc = name.split('_')[1]
         else:
             model_path = es_weight
+            val_acc = name.split('_')[2]
+
 
         model = keras.models.load_model(model_path, custom_objects=custom_objects)
 
         model_pred = model.predict(test_tokenized, batch_size=4096)
+
+        with open('predictions/' + lang + '_' + val_acc + '_.pickle', 'wb') as handle:
+            pickle.dump(model_pred, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
         model_pred = model_pred.argmax(axis=1)
 
         model_pred_class = [0] * len(model_pred)
