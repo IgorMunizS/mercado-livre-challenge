@@ -6,7 +6,7 @@ import argparse
 
 def emsemble(folder):
 
-    predictions = [f for f in os.listdir(folder) if os.path.isfile(f)]
+    predictions = [f for f in os.listdir(folder) if os.path.isfile(folder + f)]
     print(predictions)
     train = pd.read_csv("../../dados/train.csv")
     test = pd.read_csv("../../dados/test.csv")
