@@ -7,6 +7,8 @@ import sys
 from utils import tokenize, embedding, focal_loss
 import pickle
 import keras
+from keras_radam import RAdam
+
 
 def predict(languages, pt_weight,es_weight,train,test,name):
 
@@ -25,6 +27,7 @@ def predict(languages, pt_weight,es_weight,train,test,name):
 
         custom_objects = {
             'focal_loss': focal_loss,
+            'RAdam': RAdam,
         }
 
         if lang == 'portuguese':
