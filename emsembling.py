@@ -30,8 +30,8 @@ def emsemble(folder):
                 if lang == language:
                     with open('predictions/' + predict, 'rb') as handle:
                         model_predict = pickle.load(handle)
-                    model_predict_list.append(model_predict*val_acc)
-                    val_acc_list.append(val_acc)
+                    model_predict_list.append(model_predict*float(val_acc))
+                    val_acc_list.append(float(val_acc))
 
 
                     final_predict= sum(model_predict_list) / sum(val_acc_list)
@@ -46,7 +46,7 @@ def emsemble(folder):
                     test_new['category'] = model_pred_class
                     submission = submission.append(test_new[['id', 'category']])
 
-                    name = name + lang + '_'.join(val_acc_list)
+                    name = name + str(lang) + '_'.join([str(i) for i in val_acc_list])
 
     submission.to_csv('submissions/' + name + '.csv', index=False)
 
