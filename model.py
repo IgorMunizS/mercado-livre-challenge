@@ -16,13 +16,13 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     x = Attention(maxlen)(x)
 
-    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+    # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
     y = Bidirectional(LSTM(256, return_sequences=True))(x1)
 
     y = Attention(maxlen)(y)
 
-    y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
+    # y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
 
     avg_pool1 = GlobalAveragePooling1D()(x)
 
