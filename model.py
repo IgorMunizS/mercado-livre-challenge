@@ -2,6 +2,7 @@ from keras.layers import Dense,Input,LSTM,Bidirectional,Activation,Conv1D,GRU, C
 from keras.layers import Dropout,Embedding,GlobalMaxPooling1D, MaxPooling1D, Add, Flatten
 from keras.layers import GlobalAveragePooling1D, GlobalMaxPooling1D, concatenate, SpatialDropout1D
 from keras.models import Model
+from utils import Attention
 
 
 
@@ -11,19 +12,15 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     x1 = SpatialDropout1D(0.2)(x)
 
-    x = Bidirectional(CuDNNGRU(512, return_sequences=True))(x1)
+    x = Bidirectional(GRU(256, return_sequences=True))(x1)
 
-    x = Conv1D(128, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
-
-    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(x)
+    x = Attention(maxlen)(x)
 
     x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
-    y = Bidirectional(CuDNNLSTM(512, return_sequences=True))(x1)
+    y = Bidirectional(LSTM(256, return_sequences=True))(x1)
 
-    y = Conv1D(128, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
-
-    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(y)
+    y = Attention(maxlen)(y)
 
     y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
 
