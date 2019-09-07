@@ -26,8 +26,8 @@ def predict(languages, pt_weight,es_weight,train,test,name):
 
 
         custom_objects = {
-            'focal_loss': focal_loss,
             'RAdam': RAdam,
+            'focal_loss': focal_loss,
         }
 
         if lang == 'portuguese':
