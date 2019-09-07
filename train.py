@@ -46,7 +46,7 @@ def training(languages, EMBEDDING,train,test,env):
         if env == 'colab':
             model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
-            model = get_attention_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
+            model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss=[focal_loss], optimizer=opt, metrics=['accuracy'])
 
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
