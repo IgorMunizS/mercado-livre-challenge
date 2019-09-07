@@ -36,19 +36,19 @@ def emsemble(folder):
                     val_acc_list.append(float(val_acc))
 
 
-                    final_predict= sum(model_predict_list) / sum(val_acc_list)
+        final_predict= sum(model_predict_list) / sum(val_acc_list)
 
-                    model_pred = final_predict.argmax(axis=1)
+        model_pred = final_predict.argmax(axis=1)
 
-                    model_pred_class = [0] * len(final_predict)
+        model_pred_class = [0] * len(final_predict)
 
-                    for i, value in enumerate(model_pred):
-                        model_pred_class[i] = classes[value]
+        for i, value in enumerate(model_pred):
+            model_pred_class[i] = classes[value]
 
-                    test_new['category'] = model_pred_class
-                    submission = submission.append(test_new[['id', 'category']])
+        test_new['category'] = model_pred_class
+        submission = submission.append(test_new[['id', 'category']])
 
-                    name = name + str(lang) + '_'.join([str(i) for i in val_acc_list])
+        name = name + str(language) + '_'.join([str(i) for i in val_acc_list])
 
     submission.to_csv('submissions/' + name + '.csv', index=False)
 
