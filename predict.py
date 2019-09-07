@@ -4,7 +4,7 @@ import pandas as pd
 import argparse
 import sys
 
-from utils import tokenize, embedding, focal_loss
+from utils import tokenize, embedding, focal_loss, AttentionWithContext
 import pickle
 import keras
 from keras_radam import RAdam
@@ -28,6 +28,7 @@ def predict(languages, pt_weight,es_weight,train,test,name):
         custom_objects = {
             'RAdam': RAdam,
             'focal_loss': focal_loss,
+            'AttentionWithContext' : AttentionWithContext,
         }
 
         if lang == 'portuguese':
