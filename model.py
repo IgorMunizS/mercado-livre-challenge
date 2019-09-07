@@ -31,7 +31,7 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
     x = concatenate([avg_pool1, max_pool1, avg_pool2, max_pool2])
     x = Dense(128, activation="relu")(x)
     x = Dropout(0.1)(x)
-    x = BatchNormalization(x)
+    x = BatchNormalization()(x)
     preds = Dense(n_classes, activation="softmax")(x)
     model = Model(sequence_input, preds)
 
