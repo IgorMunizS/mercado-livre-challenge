@@ -2,7 +2,7 @@ from keras.layers import Dense,Input,LSTM,Bidirectional,Activation,Conv1D,GRU, C
 from keras.layers import Dropout,Embedding,GlobalMaxPooling1D, MaxPooling1D, Add, Flatten
 from keras.layers import GlobalAveragePooling1D, GlobalMaxPooling1D, concatenate, SpatialDropout1D
 from keras.models import Model
-from utils import Attention
+from utils import AttentionWithContext
 
 
 
@@ -57,3 +57,22 @@ def get_small_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
     model = Model(sequence_input, preds)
 
     return model
+
+def get_attention_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
+    sequence_input = Input(shape=(maxlen,))
+    x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
+
+    x1 = SpatialDropout1D(0.2)(x)
+
+    x = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x1)
+
+    x = Bidirectional(CuDNNLSTM(64, return_sequences=True))(x)
+
+    x = AttentionWithContext()(x)
+    x = Dense(64, activation="relu")(x)
+
+    preds = Dense(n_classes, activation="softmax")(x)
+    model = Model(sequence_input, preds)
+
+    return model
+

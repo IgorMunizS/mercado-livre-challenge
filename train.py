@@ -4,7 +4,7 @@ from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 
 from generator import DataGenerator
-from model import get_model, get_small_model
+from model import get_model, get_small_model, get_attention_model
 from utils import tokenize, embedding, focal_loss
 from sklearn.utils import class_weight
 from keras_radam import RAdam
@@ -46,7 +46,7 @@ def training(languages, EMBEDDING,train,test,env):
         if env == 'colab':
             model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
-            model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
+            model = get_attention_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss=[focal_loss], optimizer=opt, metrics=['accuracy'])
 
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
