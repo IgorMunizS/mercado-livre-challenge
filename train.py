@@ -47,7 +47,7 @@ def training(languages, EMBEDDING,train,test,env):
             model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
             model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
-        model.compile(loss=[focal_loss], optimizer=opt, metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
