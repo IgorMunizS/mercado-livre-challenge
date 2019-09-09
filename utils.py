@@ -26,7 +26,7 @@ def focal_loss(y_true, y_pred):
 
 def tokenize(X_train,X_test,max_features, maxlen, lang):
     print("Tokenizando")
-    tok = text.Tokenizer(num_words=max_features, lower=False)
+    tok = text.Tokenizer(num_words=max_features, lower=True)
     tok.fit_on_texts(list(X_train) + list(X_test))
     X_train = tok.texts_to_sequences(X_train)
     X_test = tok.texts_to_sequences(X_test)
