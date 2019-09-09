@@ -48,8 +48,9 @@ def training(languages, EMBEDDING,train,test,env):
         train_generator = DataGenerator(X_train, Y_train, classes, batch_size=4096)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=4096)
 
-        opt = RAdam(lr=1e-3)
+        # opt = RAdam(lr=1e-3)
         # opt = Nadam(lr=1e-3)
+        opt = Adam(lr=1e-3)
         if env == 'colab':
             model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
