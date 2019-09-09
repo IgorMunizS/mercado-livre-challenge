@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 from generator import DataGenerator
 from model import get_model, get_small_model, get_attention_model
-from utils import tokenize, embedding, focal_loss, CyclicLR
+from utils import tokenize, embedding, focal_loss, CyclicLR, Lookahead
 from sklearn.utils import class_weight
 from keras_radam import RAdam
 import argparse
@@ -48,34 +48,37 @@ def training(languages, EMBEDDING,train,test,env):
         train_generator = DataGenerator(X_train, Y_train, classes, batch_size=4096)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=4096)
 
-        # opt = RAdam(lr=1e-3, min_lr=1e-5)
-        opt = Nadam(lr=1e-5)
+        opt = RAdam(lr=1e-3)
+        # opt = Nadam(lr=1e-3)
         if env == 'colab':
             model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
             model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
+        lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+        lookahead.inject(model)
+
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
                                      save_weights_only=False)
         early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-        clr = CyclicLR(base_lr=0.00001, max_lr=0.001,
-                       step_size=20000.)
+        # clr = CyclicLR(base_lr=0.00001, max_lr=0.001,
+        #                step_size=20000.)
 
-        # reduce_lr = ReduceLROnPlateau(
-        #                 monitor  = 'val_loss',
-        #                 factor   = 0.3,
-        #                 patience = 1,
-        #                 verbose  = 1,
-        #                 mode     = 'auto',
-        #                 epsilon  = 0.0001,
-        #                 cooldown = 0,
-        #                 min_lr   = 0
-        #             )
+        reduce_lr = ReduceLROnPlateau(
+                        monitor  = 'val_loss',
+                        factor   = 0.3,
+                        patience = 2,
+                        verbose  = 1,
+                        mode     = 'auto',
+                        epsilon  = 0.0001,
+                        cooldown = 0,
+                        min_lr   = 0
+                    )
 
-        callbacks_list = [checkpoint, early,clr]
+        callbacks_list = [checkpoint, early,reduce_lr]
 
         print("Treinando")
 
