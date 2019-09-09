@@ -19,15 +19,15 @@ def training(languages, EMBEDDING,train,test,env):
         train_new = train[train["language"] == lang]
         test_new = test[test["language"] == lang]
 
-        # X_train = train_new['title'].str.lower()
-        X_train = train_new['title']
+        X_train = train_new['title'].str.lower()
+        # X_train = train_new['title']
 
         Y_train = train_new['category'].values
         classes = train_new["category"].unique()
 
-        X_test = test_new["title"]
+        # X_test = test_new["title"]
 
-        # X_test = test_new["title"].str.lower()
+        X_test = test_new["title"].str.lower()
 
         class_weights = class_weight.compute_class_weight('balanced',
                                                           classes,
