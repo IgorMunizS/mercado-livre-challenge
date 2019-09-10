@@ -1,16 +1,17 @@
 import pandas as pd
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
-from keras.optimizers import Adam, Nadam
+from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 
 from generator import DataGenerator
-from model import get_model, get_small_model, get_attention_model
-from utils import tokenize, embedding, focal_loss, CyclicLR, Lookahead
+from model import get_model, get_small_model
+from utils.tokenizer import tokenize
+from utils.embeddings import meta_embedding
 from sklearn.utils import class_weight
-from keras_radam import RAdam
 import argparse
 import sys
 import numpy as np
+from preprocess import clean_numbers, clean_text, replace_typical_misspell
 
 
 def training(languages, EMBEDDING,train,test,env):
@@ -19,15 +20,25 @@ def training(languages, EMBEDDING,train,test,env):
         train_new = train[train["language"] == lang]
         test_new = test[test["language"] == lang]
 
-        X_train = train_new['title'].str.lower()
-        # X_train = train_new['title']
+        train_new['title'] = train_new['title'].str.lower()
+        test_new['title'] = test_new['title'].str.lower()
+
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
+
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
+
+        X_train = train_new['title']
 
         Y_train = train_new['category'].values
         classes = train_new["category"].unique()
 
-        # X_test = test_new["title"]
+        X_test = test_new["title"]
 
-        X_test = test_new["title"].str.lower()
+
 
         class_weights = class_weight.compute_class_weight('balanced',
                                                           classes,
@@ -39,10 +50,10 @@ def training(languages, EMBEDDING,train,test,env):
         batch_size = 512
 
         tok, X_train = tokenize(X_train,X_test,max_features,maxlen,lang)
-        embedding_matrix = embedding(tok,EMBEDDING[lang][0],max_features,embed_size)
-        embedding_matrix_1 = embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
+        embedding_matrix = meta_embedding(tok,EMBEDDING[lang][0],max_features,embed_size)
+        # embedding_matrix_1 = meta_embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
 
-        embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
+        # embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
 
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 

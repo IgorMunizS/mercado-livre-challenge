@@ -1,8 +1,8 @@
-from keras.layers import Dense,Input,LSTM,Bidirectional,Activation,Conv1D,GRU, CuDNNGRU, CuDNNLSTM
-from keras.layers import Dropout,Embedding,GlobalMaxPooling1D, MaxPooling1D, Add, Flatten, BatchNormalization
+from keras.layers import Dense,Input, Bidirectional, Conv1D, CuDNNGRU, CuDNNLSTM
+from keras.layers import Embedding
 from keras.layers import GlobalAveragePooling1D, GlobalMaxPooling1D, concatenate, SpatialDropout1D
 from keras.models import Model
-from utils import AttentionWithContext
+from utils.layers import AttentionWithContext
 
 
 

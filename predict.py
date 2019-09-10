@@ -4,7 +4,8 @@ import pandas as pd
 import argparse
 import sys
 
-from utils import tokenize, embedding, focal_loss, AttentionWithContext
+from utils.layers import  AttentionWithContext
+from utils.utils import focal_loss
 import pickle
 import keras
 from keras_radam import RAdam
