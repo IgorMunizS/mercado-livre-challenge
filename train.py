@@ -52,9 +52,9 @@ def training(languages, EMBEDDING,train,test,env):
 
         tok, X_train = tokenize(X_train,X_test,max_features,maxlen,lang)
         embedding_matrix = meta_embedding(tok,EMBEDDING[lang][0],max_features,embed_size)
-        # embedding_matrix_1 = meta_embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
+        embedding_matrix_1 = meta_embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
 
-        # embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
+        embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
 
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
@@ -84,7 +84,7 @@ def training(languages, EMBEDDING,train,test,env):
         reduce_lr = ReduceLROnPlateau(
                         monitor  = 'val_loss',
                         factor   = 0.3,
-                        patience = 2,
+                        patience = 1,
                         verbose  = 1,
                         mode     = 'auto',
                         epsilon  = 0.0001,

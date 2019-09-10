@@ -375,8 +375,8 @@ def meta_embedding(tok,embedding_file,max_features,embed_size):
     num_words = min(max_features, len(word_index) + 1)
     embedding_matrix = np.zeros((num_words, embed_size))
 
-    unknown_vector = np.zeros((embed_size,), dtype=np.float32) - 1.
-    print(unknown_vector[:5])
+    # unknown_vector = np.zeros((embed_size,), dtype=np.float32) - 1.
+    # print(unknown_vector[:5])
     for key, i in word_index.items():
         if i >= max_features:
             continue
@@ -401,5 +401,5 @@ def meta_embedding(tok,embedding_file,max_features,embed_size):
             embedding_matrix[i] = embedding_vector
             continue
 
-        embedding_matrix[i] = unknown_vector
+        # embedding_matrix[i] = unknown_vector
     return embedding_matrix
