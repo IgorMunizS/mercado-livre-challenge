@@ -12,7 +12,8 @@ import argparse
 import sys
 import numpy as np
 from preprocess import clean_numbers, clean_text, replace_typical_misspell
-
+from tqdm import tqdm
+tqdm.pandas()
 
 def training(languages, EMBEDDING,train,test,env):
 
