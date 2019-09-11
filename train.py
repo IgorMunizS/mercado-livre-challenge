@@ -44,7 +44,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
         max_features = 100000
         maxlen = 30
         embed_size = 300
-        batch_size = 512
+        batch_size = 4096
 
 
 
@@ -63,8 +63,8 @@ def training(languages, EMBEDDING,train,test,env,pre):
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
-            # opt = RAdam(lr=1e-3)
-            opt = Nadam(lr=1e-3, schedule_decay=0.005)
+            opt = RAdam(lr=1e-3)
+            # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
             if env == 'colab':
                 model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
@@ -74,9 +74,24 @@ def training(languages, EMBEDDING,train,test,env,pre):
 
             print("Pré treinando")
 
+            reduce_lr = ReduceLROnPlateau(
+                            monitor  = 'val_loss',
+                            factor   = 0.3,
+                            patience = 1,
+                            verbose  = 1,
+                            mode     = 'auto',
+                            epsilon  = 0.0001,
+                            cooldown = 0,
+                            min_lr   = 0
+                        )
+            early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
+
+            callbacks_list = [early, reduce_lr]
+
             model.fit_generator(generator=train_generator,
                                 validation_data=val_generator,
-                                epochs=10,
+                                callbacks=callbacks_list,
+                                epochs=30,
                                 use_multiprocessing=True,
                                 workers=42)
 
@@ -101,27 +116,33 @@ def training(languages, EMBEDDING,train,test,env,pre):
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             model.layers[1].set_weights([embedding_matrix])
+            opt = Adam(lr=1e-3)
+            model.compile(optimizer=opt)
 
             filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
             checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
                                          save_weights_only=False)
             early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-            # clr = CyclicLR(base_lr=0.000001, max_lr=0.001,
-            #                step_size=35000.)
+            clr = CyclicLR(base_lr=0.001, max_lr=0.005,
+                           step_size=4394, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
 
-            reduce_lr = ReduceLROnPlateau(
-                            monitor  = 'val_loss',
-                            factor   = 0.3,
-                            patience = 1,
-                            verbose  = 1,
-                            mode     = 'auto',
-                            epsilon  = 0.0001,
-                            cooldown = 0,
-                            min_lr   = 0
-                        )
+            # reduce_lr = ReduceLROnPlateau(
+            #                 monitor  = 'val_loss',
+            #                 factor   = 0.3,
+            #                 patience = 1,
+            #                 verbose  = 1,
+            #                 mode     = 'auto',
+            #                 epsilon  = 0.0001,
+            #                 cooldown = 0,
+            #                 min_lr   = 0
+            #             )
 
-            callbacks_list = [checkpoint, early, reduce_lr]
+            callbacks_list = [checkpoint, early, clr]
+
+            # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+            # lookahead.inject(model)
+
 
             print("Treinando")
 
@@ -145,8 +166,8 @@ def training(languages, EMBEDDING,train,test,env,pre):
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             # opt = RAdam(lr=1e-3)
-            opt = Nadam(lr=1e-3)
-            # opt = Adam(lr=1e-3)
+            # opt = Nadam(lr=1e-3)
+            opt = Adam(lr=1e-3)
             if env == 'colab':
                 model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
             else:
