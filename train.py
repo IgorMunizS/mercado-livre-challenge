@@ -58,8 +58,8 @@ def training(languages, EMBEDDING,train,test,env,pre):
 
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
-            train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+            train_generator = DataGenerator(X_train.to_numpy(), Y_train.to_numpy(), classes, batch_size=batch_size)
+            val_generator = DataGenerator(X_val.to_numpy(), Y_val.to_numpy(), classes, batch_size=batch_size)
 
             # opt = RAdam(lr=1e-3)
             opt = Nadam(lr=1e-3, schedule_decay=0.005)
