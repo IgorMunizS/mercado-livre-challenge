@@ -55,7 +55,7 @@ def training(languages, EMBEDDING,train,test,env):
         glove_embedding_matrix = meta_embedding(tok,EMBEDDING[lang][0],max_features,embed_size)
         fast_embedding_matrix = meta_embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
 
-        # embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
+        embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
@@ -68,7 +68,7 @@ def training(languages, EMBEDDING,train,test,env):
         if env == 'colab':
             model = get_small_model(maxlen, max_features, embed_size, glove_embedding_matrix, len(classes))
         else:
-            model = get_model(maxlen,max_features,embed_size,glove_embedding_matrix, fast_embedding_matrix,len(classes))
+            model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
         lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead

@@ -8,25 +8,25 @@ from keras import Sequential
 import tensorflow as tf
 
 
-def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedding_matrix,n_classes):
-    # sequence_input = Input(shape=(maxlen,))
+def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
+    sequence_input = Input(shape=(maxlen,))
 
-    fast_embedding = tf.keras.layers.Embedding(max_features, embed_size,
-                                              embeddings_initializer=tf.keras.initializers.Constant(fast_embedding_matrix),
-                                              trainable=False)
-    glove_embedding = tf.keras.layers.Embedding(max_features,
-                                                embed_size,
-                                                embeddings_initializer=tf.keras.initializers.Constant(glove_embedding_matrix),
-                                                trainable=False)
+    # fast_embedding = tf.keras.layers.Embedding(max_features, embed_size,
+    #                                           embeddings_initializer=tf.keras.initializers.Constant(fast_embedding_matrix),
+    #                                           trainable=False)
+    # glove_embedding = tf.keras.layers.Embedding(max_features,
+    #                                             embed_size,
+    #                                             embeddings_initializer=tf.keras.initializers.Constant(glove_embedding_matrix),
+    #                                             trainable=False)
+    #
+    # embedding_model = tf.keras.Sequential([tf.keras.layers.Input(shape=(maxlen,), dtype='int32'),
+    #                              DynamicMetaEmbedding([fast_embedding, glove_embedding])])
 
-    embedding_model = tf.keras.Sequential([tf.keras.layers.Input(shape=(maxlen,), dtype='int32'),
-                                 DynamicMetaEmbedding([fast_embedding, glove_embedding])])
-
-    # x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
+    x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
 
     # x = DynamicMetaEmbedding([fast_embedding, glove_embedding])()
 
-    x1 = SpatialDropout1D(0.2)(embedding_model.output)
+    x1 = SpatialDropout1D(0.2)(sequence_input)
 
     x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
 
@@ -54,7 +54,7 @@ def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedd
 
     x = concatenate([avg_pool1, max_pool1, avg_pool2, max_pool2])
     preds = Dense(n_classes, activation="softmax")(x)
-    model = Model(embedding_model.input, preds)
+    model = Model(sequence_input, preds)
 
     return model
 
