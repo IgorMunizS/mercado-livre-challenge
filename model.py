@@ -5,19 +5,21 @@ from keras.models import Model
 from utils.layers import AttentionWithContext
 from utils.embeddings import DynamicMetaEmbedding
 from keras import Sequential
+import tensorflow as tf
+
 
 def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedding_matrix,n_classes):
     # sequence_input = Input(shape=(maxlen,))
 
-    fast_embedding = Embedding(max_features, embed_size,
-                                              weights=[fast_embedding_matrix],
+    fast_embedding = tf.keras.layers.Embedding(max_features, embed_size,
+                                              embeddings_initializer=tf.keras.initializers.Constant(fast_embedding_matrix),
                                               trainable=False)
-    glove_embedding = Embedding(max_features,
+    glove_embedding = tf.keras.layers.Embedding(max_features,
                                                 embed_size,
-                                                weights=[glove_embedding_matrix],
+                                                embeddings_initializer=tf.keras.initializers.Constant(glove_embedding_matrix),
                                                 trainable=False)
 
-    embedding_model = Sequential([Input(shape=(maxlen,), dtype='int32'),
+    embedding_model = tf.keras.Sequential([tf.keras.layers.Input(shape=(maxlen,), dtype='int32'),
                                  DynamicMetaEmbedding([fast_embedding, glove_embedding])])
 
     # x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
