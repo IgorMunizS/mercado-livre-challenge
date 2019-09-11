@@ -4,10 +4,10 @@ from keras.layers import GlobalAveragePooling1D, GlobalMaxPooling1D, concatenate
 from keras.models import Model
 from utils.layers import AttentionWithContext
 from utils.embeddings import DynamicMetaEmbedding
-
+from keras import Sequential
 
 def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedding_matrix,n_classes):
-    sequence_input = Input(shape=(maxlen,))
+    # sequence_input = Input(shape=(maxlen,))
 
     fast_embedding = Embedding(max_features, embed_size,
                                               weights=[fast_embedding_matrix],
@@ -17,11 +17,14 @@ def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedd
                                                 weights=[glove_embedding_matrix],
                                                 trainable=False)
 
+    embedding_model = Sequential([Input(shape=(maxlen,), dtype='int32'),
+                                 DynamicMetaEmbedding([fast_embedding, glove_embedding])])
+
     # x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
 
-    x = DynamicMetaEmbedding([fast_embedding, glove_embedding])(sequence_input)
+    # x = DynamicMetaEmbedding([fast_embedding, glove_embedding])()
 
-    x1 = SpatialDropout1D(0.2)(x)
+    x1 = SpatialDropout1D(0.2)(embedding_model.output)
 
     x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
 
@@ -49,7 +52,7 @@ def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedd
 
     x = concatenate([avg_pool1, max_pool1, avg_pool2, max_pool2])
     preds = Dense(n_classes, activation="softmax")(x)
-    model = Model(sequence_input, preds)
+    model = Model(embedding_model.input, preds)
 
     return model
 
