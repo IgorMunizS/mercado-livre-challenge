@@ -26,7 +26,7 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     # x = DynamicMetaEmbedding([fast_embedding, glove_embedding])()
 
-    x1 = SpatialDropout1D(0.2)(sequence_input)
+    x1 = SpatialDropout1D(0.2)(x)
 
     x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
 
