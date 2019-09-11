@@ -66,13 +66,14 @@ def get_small_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
 
-    x = Conv1D(32, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
     avg_pool1 = GlobalAveragePooling1D()(x)
 
     max_pool1 = GlobalMaxPooling1D()(x)
 
     x = concatenate([avg_pool1, max_pool1])
+
     preds = Dense(n_classes, activation="softmax")(x)
     model = Model(sequence_input, preds)
 

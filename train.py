@@ -66,7 +66,7 @@ def training(languages, EMBEDDING,train,test,env):
         # opt = Nadam(lr=1e-3)
         opt = Adam(lr=1e-3)
         if env == 'colab':
-            model = get_small_model(maxlen, max_features, embed_size, glove_embedding_matrix, len(classes))
+            model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
             model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
@@ -79,21 +79,21 @@ def training(languages, EMBEDDING,train,test,env):
                                      save_weights_only=False)
         early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-        # clr = CyclicLR(base_lr=0.000001, max_lr=0.001,
-        #                step_size=4500.)
+        clr = CyclicLR(base_lr=0.001, max_lr=0.003,
+                       step_size=50000.)
 
-        reduce_lr = ReduceLROnPlateau(
-                        monitor  = 'val_loss',
-                        factor   = 0.3,
-                        patience = 1,
-                        verbose  = 1,
-                        mode     = 'auto',
-                        epsilon  = 0.0001,
-                        cooldown = 0,
-                        min_lr   = 0
-                    )
+        # reduce_lr = ReduceLROnPlateau(
+        #                 monitor  = 'val_loss',
+        #                 factor   = 0.3,
+        #                 patience = 1,
+        #                 verbose  = 1,
+        #                 mode     = 'auto',
+        #                 epsilon  = 0.0001,
+        #                 cooldown = 0,
+        #                 min_lr   = 0
+        #             )
 
-        callbacks_list = [checkpoint, early,reduce_lr]
+        callbacks_list = [checkpoint, early,clr]
 
         print("Treinando")
 
