@@ -1,6 +1,6 @@
 import pandas as pd
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
-from keras.optimizers import Adam
+from keras.optimizers import Adam, Nadam
 from sklearn.model_selection import train_test_split
 from keras_radam import RAdam
 from generator import DataGenerator
@@ -63,8 +63,8 @@ def training(languages, EMBEDDING,train,test,env):
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
         # opt = RAdam(lr=1e-3)
-        # opt = Nadam(lr=1e-3)
-        opt = Adam(lr=1e-3)
+        opt = Nadam(lr=1e-3)
+        # opt = Adam(lr=1e-3)
         if env == 'colab':
             model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
         else:
@@ -79,8 +79,8 @@ def training(languages, EMBEDDING,train,test,env):
                                      save_weights_only=False)
         early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-        clr = CyclicLR(base_lr=0.001, max_lr=0.003,
-                       step_size=50000.)
+        clr = CyclicLR(base_lr=0.000001, max_lr=0.001,
+                       step_size=35000.)
 
         # reduce_lr = ReduceLROnPlateau(
         #                 monitor  = 'val_loss',
