@@ -7,6 +7,8 @@ import argparse
 import sys
 from preprocess import clean_numbers, clean_text, replace_typical_misspell
 import pandas as pd
+from tqdm import tqdm
+tqdm.pandas()
 
 def finetunning(languages, model,train,test,env):
 
