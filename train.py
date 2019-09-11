@@ -56,10 +56,6 @@ def training(languages, EMBEDDING,train,test,env,pre):
             X_train = train_new[train_new['label_quality']=='reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
 
-            class_weights = class_weight.compute_class_weight('balanced',
-                                                              classes,
-                                                              Y_train)
-
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
@@ -78,7 +74,6 @@ def training(languages, EMBEDDING,train,test,env,pre):
 
             model.fit_generator(generator=train_generator,
                                 validation_data=val_generator,
-                                class_weight=class_weights,
                                 epochs=10,
                                 use_multiprocessing=True,
                                 workers=42)
@@ -188,7 +183,7 @@ def parse_args(args):
 
 
     parser.add_argument('--env', help='Local of training', default='v100')
-    parser.add_argument('--pre', help='Pretraining with only reliable values', default=False)
+    parser.add_argument('--pre', help='Pretraining with only reliable values', default=False, type=bool)
 
 
     return parser.parse_args(args)
