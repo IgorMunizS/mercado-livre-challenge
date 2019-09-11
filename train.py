@@ -46,20 +46,22 @@ def training(languages, EMBEDDING,train,test,env,pre):
         embed_size = 300
         batch_size = 512
 
-        tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
-        glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
-        fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-        embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
         if pre:
             X_train = train_new[train_new['label_quality']=='reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
 
+            tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
+            glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
+            fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
+
+            embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
-            train_generator = DataGenerator(X_train.to_numpy(), Y_train, classes, batch_size=batch_size)
-            val_generator = DataGenerator(X_val.to_numpy(), Y_val, classes, batch_size=batch_size)
+            train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
+            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             # opt = RAdam(lr=1e-3)
             opt = Nadam(lr=1e-3, schedule_decay=0.005)
@@ -78,9 +80,16 @@ def training(languages, EMBEDDING,train,test,env,pre):
                                 use_multiprocessing=True,
                                 workers=42)
 
+
             X_train = train_new['title']
 
             Y_train = train_new['category'].values
+
+            tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
+            glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
+            fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
+
+            embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
             class_weights = class_weight.compute_class_weight('balanced',
                                                               classes,
@@ -90,6 +99,8 @@ def training(languages, EMBEDDING,train,test,env,pre):
 
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+
+            model.layers[1].set_weights(embedding_matrix)
 
             filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
             checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
