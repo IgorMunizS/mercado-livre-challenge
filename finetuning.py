@@ -1,23 +1,12 @@
 from pre_models import get_bert_model
-from generator import DataGenerator
 
-
-import pandas as pd
-from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
-from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 
-from generator import DataGenerator
-from model import get_model, get_small_model
-from utils.tokenizer import tokenize
-from utils.embeddings import meta_embedding
 from sklearn.utils import class_weight
 import argparse
 import sys
-import numpy as np
 from preprocess import clean_numbers, clean_text, replace_typical_misspell
-from tqdm import tqdm
-tqdm.pandas()
+import pandas as pd
 
 def finetunning(languages, model,train,test,env):
 
