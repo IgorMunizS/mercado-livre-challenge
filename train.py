@@ -2,11 +2,12 @@ import pandas as pd
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
-
+from keras_radam import RAdam
 from generator import DataGenerator
 from model import get_model, get_small_model
 from utils.tokenizer import tokenize
 from utils.embeddings import meta_embedding
+from utils.callbacks import Lookahead, CyclicLR
 from sklearn.utils import class_weight
 import argparse
 import sys
@@ -51,35 +52,35 @@ def training(languages, EMBEDDING,train,test,env):
         batch_size = 512
 
         tok, X_train = tokenize(X_train,X_test,max_features,maxlen,lang)
-        embedding_matrix = meta_embedding(tok,EMBEDDING[lang][0],max_features,embed_size)
-        embedding_matrix_1 = meta_embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
+        glove_embedding_matrix = meta_embedding(tok,EMBEDDING[lang][0],max_features,embed_size)
+        fast_embedding_matrix = meta_embedding(tok,EMBEDDING[lang][1],max_features,embed_size)
 
-        embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
+        # embedding_matrix = np.mean([embedding_matrix, embedding_matrix_1], axis=0)
 
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
         train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
-        # opt = RAdam(lr=1e-3)
+        opt = RAdam(lr=1e-3)
         # opt = Nadam(lr=1e-3)
-        opt = Adam(lr=1e-3)
+        # opt = Adam(lr=1e-3)
         if env == 'colab':
-            model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+            model = get_small_model(maxlen, max_features, embed_size, glove_embedding_matrix, len(classes))
         else:
-            model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
+            model = get_model(maxlen,max_features,embed_size,glove_embedding_matrix, fast_embedding_matrix,len(classes))
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
-        # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
-        # lookahead.inject(model)
+        lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+        lookahead.inject(model)
 
         filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
                                      save_weights_only=False)
         early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-        # clr = CyclicLR(base_lr=0.00001, max_lr=0.001,
-        #                step_size=20000.)
+        clr = CyclicLR(base_lr=0.000001, max_lr=0.001,
+                       step_size=4500.)
 
         reduce_lr = ReduceLROnPlateau(
                         monitor  = 'val_loss',
@@ -92,7 +93,7 @@ def training(languages, EMBEDDING,train,test,env):
                         min_lr   = 0
                     )
 
-        callbacks_list = [checkpoint, early,reduce_lr]
+        callbacks_list = [checkpoint, early,clr]
 
         print("Treinando")
 

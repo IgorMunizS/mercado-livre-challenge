@@ -3,20 +3,39 @@ from keras.layers import Embedding
 from keras.layers import GlobalAveragePooling1D, GlobalMaxPooling1D, concatenate, SpatialDropout1D
 from keras.models import Model
 from utils.layers import AttentionWithContext
+from utils.embeddings import DynamicMetaEmbedding
 
 
-
-def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
+def get_model(maxlen, max_features,embed_size,glove_embedding_matrix,fast_embedding_matrix,n_classes):
     sequence_input = Input(shape=(maxlen,))
-    x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
+
+    fast_embedding = Embedding(max_features, embed_size,
+                                              weights=[fast_embedding_matrix],
+                                              trainable=False)
+    glove_embedding = Embedding(max_features,
+                                                embed_size,
+                                                weights=[glove_embedding_matrix],
+                                                trainable=False)
+
+    # x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
+
+    x = DynamicMetaEmbedding([fast_embedding, glove_embedding])(sequence_input)
 
     x1 = SpatialDropout1D(0.2)(x)
 
-    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(x1)
+    x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
 
     x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
-    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x1)
+    x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x)
+
+    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+
+    y = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x1)
+
+    y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
+
+    y = Bidirectional(CuDNNLSTM(128, return_sequences=True))(y)
 
     y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
 
