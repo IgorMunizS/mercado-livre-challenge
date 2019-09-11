@@ -49,7 +49,7 @@ def finetunning(languages, model,train,test,env):
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
         if model == 'bert':
-            model = get_bert_model(batch_size,maxlen,len(X_train),(X_val,Y_val),'../models/')
+            model = get_bert_model(batch_size,maxlen,len(X_train),'../models/')
 
         model.fit(X_train,Y_train)
 
