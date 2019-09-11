@@ -44,7 +44,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
         max_features = 100000
         maxlen = 30
         embed_size = 300
-        batch_size = 4096
+        batch_size = 128
 
 
 
@@ -125,7 +125,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
             early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
             clr = CyclicLR(base_lr=0.001, max_lr=0.005,
-                           step_size=4394, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
+                           step_size=140000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
 
             # reduce_lr = ReduceLROnPlateau(
             #                 monitor  = 'val_loss',
