@@ -116,7 +116,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             model.layers[1].set_weights([embedding_matrix])
-            opt = Adam(lr=1e-3)
+            opt = Adam(lr=0.0003)
             model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
             filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'

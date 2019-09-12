@@ -26,13 +26,21 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     # x = DynamicMetaEmbedding([fast_embedding, glove_embedding])()
 
-    x1 = SpatialDropout1D(0.2)(x)
+    # x1 = SpatialDropout1D(0.2)(x)
 
-    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(x1)
+    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(sequence_input)
 
     x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
-    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x1)
+    x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x)
+
+    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+
+    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(sequence_input)
+
+    y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
+
+    y = Bidirectional(CuDNNLSTM(128, return_sequences=True))(y)
 
     y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
 
