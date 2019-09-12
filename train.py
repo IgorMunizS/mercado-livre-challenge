@@ -124,24 +124,24 @@ def training(languages, EMBEDDING,train,test,env,pre):
                                          save_weights_only=False)
             early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-            clr = CyclicLR(base_lr=0.0003, max_lr=0.001,
-                           step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
+            # clr = CyclicLR(base_lr=0.0003, max_lr=0.001,
+            #                step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
 
-            # reduce_lr = ReduceLROnPlateau(
-            #                 monitor  = 'val_loss',
-            #                 factor   = 0.3,
-            #                 patience = 1,
-            #                 verbose  = 1,
-            #                 mode     = 'auto',
-            #                 epsilon  = 0.0001,
-            #                 cooldown = 0,
-            #                 min_lr   = 0
-            #             )
+            reduce_lr = ReduceLROnPlateau(
+                            monitor  = 'val_loss',
+                            factor   = 0.3,
+                            patience = 1,
+                            verbose  = 1,
+                            mode     = 'auto',
+                            epsilon  = 0.0001,
+                            cooldown = 0,
+                            min_lr   = 0
+                        )
 
-            callbacks_list = [checkpoint, early, clr]
+            callbacks_list = [checkpoint, early, reduce_lr]
 
-            # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
-            # lookahead.inject(model)
+            lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+            lookahead.inject(model)
 
 
             print("Treinando")
