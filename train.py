@@ -56,7 +56,9 @@ def training(languages, EMBEDDING,train,test,env,pre):
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-            embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+            # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
 
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
@@ -67,9 +69,9 @@ def training(languages, EMBEDDING,train,test,env,pre):
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
             if env == 'colab':
-                model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+                model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
             else:
-                model = get_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+                model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
             model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
             print("Pré treinando")
@@ -104,7 +106,10 @@ def training(languages, EMBEDDING,train,test,env,pre):
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-            embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+            # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
+
 
             class_weights = class_weight.compute_class_weight('balanced',
                                                               classes,
@@ -116,7 +121,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             model.layers[1].set_weights([embedding_matrix])
-            opt = Adam(lr=0.0003)
+            opt = Adam(lr=0.001)
             model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
             filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'

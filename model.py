@@ -26,33 +26,41 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     # x = DynamicMetaEmbedding([fast_embedding, glove_embedding])()
 
+    x = SpatialDropout1D(0.3)(embedding)
+    x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
+    x2 = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
+    max_pool1 = GlobalMaxPooling1D()(x1)
+    max_pool2 = GlobalMaxPooling1D()(x2)
+    x = concatenate([max_pool1, max_pool2])
+
     # x1 = SpatialDropout1D(0.2)(x)
+    #
+    # x = Bidirectional(CuDNNGRU(256, return_sequences=True))(embedding)
+    #
+    # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+    #
+    # x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x)
+    #
+    # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
+    #
+    # y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(embedding)
+    #
+    # y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
+    #
+    # y = Bidirectional(CuDNNLSTM(128, return_sequences=True))(y)
+    #
+    # y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
+    #
+    # avg_pool1 = GlobalAveragePooling1D()(x)
+    #
+    # max_pool1 = GlobalMaxPooling1D()(x)
+    #
+    # avg_pool2 = GlobalAveragePooling1D()(y)
+    #
+    # max_pool2 = GlobalMaxPooling1D()(y)
+    #
+    # x = concatenate([avg_pool1, max_pool1, avg_pool2, max_pool2])
 
-    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(embedding)
-
-    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
-
-    x = Bidirectional(CuDNNGRU(128, return_sequences=True))(x)
-
-    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
-
-    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(embedding)
-
-    y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
-
-    y = Bidirectional(CuDNNLSTM(128, return_sequences=True))(y)
-
-    y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
-
-    avg_pool1 = GlobalAveragePooling1D()(x)
-
-    max_pool1 = GlobalMaxPooling1D()(x)
-
-    avg_pool2 = GlobalAveragePooling1D()(y)
-
-    max_pool2 = GlobalMaxPooling1D()(y)
-
-    x = concatenate([avg_pool1, max_pool1, avg_pool2, max_pool2])
     preds = Dense(n_classes, activation="softmax")(x)
     model = Model(sequence_input, preds)
 
