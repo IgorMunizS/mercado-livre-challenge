@@ -22,13 +22,13 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
     # embedding_model = tf.keras.Sequential([tf.keras.layers.Input(shape=(maxlen,), dtype='int32'),
     #                              DynamicMetaEmbedding([fast_embedding, glove_embedding])])
 
-    x = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
+    embedding = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False)(sequence_input)
 
     # x = DynamicMetaEmbedding([fast_embedding, glove_embedding])()
 
     # x1 = SpatialDropout1D(0.2)(x)
 
-    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(sequence_input)
+    x = Bidirectional(CuDNNGRU(256, return_sequences=True))(embedding)
 
     x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
@@ -36,7 +36,7 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
     x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x)
 
-    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(sequence_input)
+    y = Bidirectional(CuDNNLSTM(256, return_sequences=True))(embedding)
 
     y = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(y)
 
