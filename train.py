@@ -117,7 +117,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
 
             model.layers[1].set_weights([embedding_matrix])
             opt = Adam(lr=1e-3)
-            model.compile(optimizer=opt)
+            model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
             filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
             checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
