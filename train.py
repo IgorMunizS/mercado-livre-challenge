@@ -124,7 +124,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
                                          save_weights_only=False)
             early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
 
-            clr = CyclicLR(base_lr=0.001, max_lr=0.003,
+            clr = CyclicLR(base_lr=0.0003, max_lr=0.001,
                            step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
 
             # reduce_lr = ReduceLROnPlateau(
