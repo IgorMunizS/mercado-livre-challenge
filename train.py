@@ -60,7 +60,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
 
             embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
 
-            X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
+            X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
 
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
@@ -115,7 +115,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
                                                               classes,
                                                               Y_train)
 
-            X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
+            X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
 
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
