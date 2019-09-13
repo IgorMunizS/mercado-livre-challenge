@@ -3,6 +3,7 @@ import re
 
 
 def build_features(df):
+    print("Gerando Features")
     df['small_title'] = df['title'].apply(lambda x: ' '.join(x.split(' ')[:5]))
     df['n_words'] = df['title'].apply(lambda x: len(x.split(' ')))
     df['length'] = df['title'].apply(lambda x: len(x))

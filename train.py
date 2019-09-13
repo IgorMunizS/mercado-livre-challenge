@@ -4,7 +4,7 @@ from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 from keras_radam import RAdam
 from generator import DataGenerator
-from model import get_model, get_small_model
+from model import get_model, get_small_model, get_three_entrys_model
 from utils.tokenizer import tokenize, save_multi_inputs
 from utils.embeddings import meta_embedding
 from utils.callbacks import Lookahead, CyclicLR
@@ -64,6 +64,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
+            # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
+
             if type_model == 'three':
                 X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_tile']
                 X_train_3 = train_new[train_new['label_quality'] == 'reliable']\
@@ -80,10 +84,6 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             else:
 
-                # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
-
-                embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
-
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
                 train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
@@ -94,6 +94,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             # opt = Adam(lr=1e-3)
             if type_model == 'small':
                 model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
+
+            elif type_model == 'three':
+                model = get_three_entrys_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+
             else:
                 model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
             model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
@@ -222,6 +226,9 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             opt = Adam(lr=1e-3)
             if type_model == 'colab':
                 model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+            elif type_model == 'three':
+                model = get_three_entrys_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+
             else:
                 model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
             model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
