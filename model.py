@@ -68,8 +68,8 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
 
 def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
     sequence_input = Input(shape=(maxlen,))
-    small_sequence_input = Input(shape=(7,))
-    features_input = Input(shape=(4,))
+    small_sequence_input = Input(shape=(5,))
+    features_input = Input(shape=(7,))
 
     embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False, name='embedding_layer')(sequence_input)
 

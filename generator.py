@@ -7,9 +7,16 @@ class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
     def __init__(self, X, Y=None, classes=None, batch_size=32, dim=(32, 32, 32),
-                 shuffle=True):
+                 shuffle=True, mode='normal'):
         'Initialization'
-        self.X = X
+        self.mode = mode
+        if self.mode == 'normal':
+            self.X = X
+        else:
+            self.X = X[0]
+            self.X_2 = X[1]
+            self.X_3 = X[2]
+
         self.Y = Y
         self.dim = dim
         self.batch_size = batch_size
@@ -30,9 +37,17 @@ class DataGenerator(keras.utils.Sequence):
         indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
 
         # Find list of IDs
-        X_temp = [self.X[k] for k in indexes]
-        Y_temp = [self.Y[k] for k in indexes]
+        if self.mode == 'normal':
+            X_temp = [self.X[k] for k in indexes]
 
+        else:
+            X_temp = [self.X[k] for k in indexes]
+            X_temp_2 = [self.X_2[k] for k in indexes]
+            X_temp_3 = [self.X_3[k] for k in indexes]
+
+            X_temp = [X_temp, X_temp_2,X_temp_3]
+
+        Y_temp = [self.Y[k] for k in indexes]
         # Generate data
         X, y = self.__data_generation(X_temp, Y_temp)
 

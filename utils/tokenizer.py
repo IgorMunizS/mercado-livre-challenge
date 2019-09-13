@@ -14,3 +14,10 @@ def tokenize(X_train,X_test,max_features, maxlen, lang):
         pickle.dump(X_test, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     return tok, X_train
+
+def save_multi_inputs(X_test_small,features, lang):
+    with open('../tokenizers/' + lang + '_small_tokenizer.pickle', 'wb') as handle:
+        pickle.dump(X_test_small, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('../tokenizers/' + lang + '_features_tokenizer.pickle', 'wb') as handle:
+        pickle.dump(features, handle, protocol=pickle.HIGHEST_PROTOCOL)

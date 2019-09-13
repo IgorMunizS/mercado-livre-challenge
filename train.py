@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from keras_radam import RAdam
 from generator import DataGenerator
 from model import get_model, get_small_model
-from utils.tokenizer import tokenize
+from utils.tokenizer import tokenize, save_multi_inputs
 from utils.embeddings import meta_embedding
 from utils.callbacks import Lookahead, CyclicLR
 from sklearn.utils import class_weight
@@ -13,8 +13,11 @@ import argparse
 import sys
 import numpy as np
 from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell
+from utils.features import build_features
 from tqdm import tqdm
 tqdm.pandas()
+from keras.preprocessing import sequence
+
 
 def training(languages, EMBEDDING,train,test,type_model,pre):
 
@@ -33,6 +36,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
 
+        if type_model == 'three':
+            train_new = build_features(train_new)
+            test_new = build_features(test_new)
+
         X_train = train_new['title']
 
         Y_train = train_new['category'].values
@@ -42,28 +49,45 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         X_test = test_new["title"]
 
         max_features = 100000
-        maxlen = 30
+        maxlen = 20
         embed_size = 300
         batch_size = 512
 
 
 
         if pre:
-            X_train = train_new[train_new['label_quality']=='reliable']['title']
+            X_train = train_new[train_new['label_quality'] == 'reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
+
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-            # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+            if type_model == 'three':
+                X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_tile']
+                X_train_3 = train_new[train_new['label_quality'] == 'reliable']\
+                            [['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
 
-            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
+                X_train_2 = tok.texts_to_sequences(X_train_2)
+                X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
 
-            X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
-            train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+                X_train, X_val,  X_train_2, X_val_2, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_2, X_train_3, Y_train, train_size=0.9, random_state=233)
+
+                train_generator = DataGenerator([X_train, X_train_2, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val,X_val_2,X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+
+            else:
+
+                # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
+
+                embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
+
+                X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
+
+                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
+                val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
@@ -115,12 +139,35 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                                                               classes,
                                                               Y_train)
 
-            X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
+            if type_model == 'three':
+                X_train_2 = train_new['small_tile']
+                X_train_3 = train_new[['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
 
-            train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+                X_train_2 = tok.texts_to_sequences(X_train_2)
+                X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
 
-            model.layers[1].set_weights([embedding_matrix])
+                X_test_small = test_new["small_title"]
+                X_test_features =  test_new[['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
+
+                save_multi_inputs(X_test_small,X_test_features, lang)
+
+                X_train, X_val,  X_train_2, X_val_2, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_2, X_train_3, Y_train, train_size=0.9, random_state=233)
+
+                train_generator = DataGenerator([X_train, X_train_2, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val,X_val_2,X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+                model.get_layer('embedding_layer').set_weights([embedding_matrix])
+                model.get_layer('small_embedding_layer').set_weights([embedding_matrix])
+
+            else:
+
+                X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
+
+                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
+                val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+
+                model.layers[1].set_weights([embedding_matrix])
+
+
             opt = Adam(lr=0.001)
             model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
