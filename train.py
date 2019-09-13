@@ -69,7 +69,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
 
             if type_model == 'three':
-                X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_tile']
+                X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
                 X_train_3 = train_new[train_new['label_quality'] == 'reliable']\
                             [['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
 
@@ -144,7 +144,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                                                               Y_train)
 
             if type_model == 'three':
-                X_train_2 = train_new['small_tile']
+                X_train_2 = train_new['small_title']
                 X_train_3 = train_new[['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
 
                 X_train_2 = tok.texts_to_sequences(X_train_2)
