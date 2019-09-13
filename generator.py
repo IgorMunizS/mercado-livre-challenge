@@ -66,7 +66,11 @@ class DataGenerator(keras.utils.Sequence):
         for i in range(len(Y)):
             y[i] = list(self.classes).index(Y[i])
 
-        if self.mode != 'three':
+
+        if self.mode == 'three':
+            X = [np.array(X[0]),np.array(X[1]), np.array(X[2])]
+        else:
+
             X = np.array(X)
 
         return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
