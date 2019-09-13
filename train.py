@@ -1,6 +1,6 @@
 import pandas as pd
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
-from keras.optimizers import Adam, Nadam
+from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 from keras_radam import RAdam
 from generator import DataGenerator
@@ -12,11 +12,11 @@ from sklearn.utils import class_weight
 import argparse
 import sys
 import numpy as np
-from preprocess import clean_numbers, clean_text, replace_typical_misspell
+from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell
 from tqdm import tqdm
 tqdm.pandas()
 
-def training(languages, EMBEDDING,train,test,env,pre):
+def training(languages, EMBEDDING,train,test,type_model,pre):
 
     for lang in languages:
         train_new = train[train["language"] == lang]
@@ -68,7 +68,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
             opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
-            if env == 'colab':
+            if type_model == 'small':
                 model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
             else:
                 model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
@@ -173,7 +173,7 @@ def training(languages, EMBEDDING,train,test,env,pre):
             # opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3)
             opt = Adam(lr=1e-3)
-            if env == 'colab':
+            if type_model == 'colab':
                 model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
             else:
                 model = get_model(maxlen,max_features,embed_size,embedding_matrix,len(classes))
@@ -219,7 +219,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description='Predict script')
 
 
-    parser.add_argument('--env', help='Local of training', default='v100')
+    parser.add_argument('--model', help='Local of training', default='normal')
     parser.add_argument('--pre', help='Pretraining with only reliable values', default=False, type=bool)
 
 
@@ -240,4 +240,4 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     args = parse_args(args)
 
-    training(languages,EMBEDDING,train,test,args.env, args.pre)
+    training(languages,EMBEDDING,train,test,args.model, args.pre)

@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 import argparse
 import sys
-from preprocess import clean_numbers, clean_text, replace_typical_misspell
+from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell
 import pandas as pd
 from tqdm import tqdm
 tqdm.pandas()
