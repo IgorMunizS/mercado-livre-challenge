@@ -96,7 +96,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
 
             elif type_model == 'three':
-                model = get_three_entrys_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
+                model = get_three_entrys_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
 
             else:
                 model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
