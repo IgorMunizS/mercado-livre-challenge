@@ -66,6 +66,7 @@ class DataGenerator(keras.utils.Sequence):
         for i in range(len(Y)):
             y[i] = list(self.classes).index(Y[i])
 
-        x = np.array(X)
+        if self.mode != 'three':
+            X = np.array(X)
 
-        return x, keras.utils.to_categorical(y, num_classes=self.n_classes)
+        return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
