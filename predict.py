@@ -11,7 +11,7 @@ import keras
 from keras_radam import RAdam
 
 
-def predict(languages, pt_weight,es_weight,train,test,name):
+def predict(languages, pt_weight,es_weight,train,test,name,model):
 
     submission = pd.DataFrame()
 
@@ -24,6 +24,13 @@ def predict(languages, pt_weight,es_weight,train,test,name):
 
         with open('../tokenizers/' + lang +'_tokenizer.pickle', 'rb') as handle:
             test_tokenized = pickle.load(handle)
+
+        if model == 'three':
+            with open('../tokenizers/' + lang + '_small_tokenizer.pickle', 'rb') as handle:
+                test_tokenized_small = pickle.load(handle)
+
+            with open('../tokenizers/' + lang + '_features_tokenizer.pickle', 'rb') as handle:
+                test_tokenized_features = pickle.load(handle)
 
 
         custom_objects = {
@@ -42,7 +49,10 @@ def predict(languages, pt_weight,es_weight,train,test,name):
 
         model = keras.models.load_model(model_path, custom_objects=custom_objects)
 
-        model_pred = model.predict(test_tokenized, batch_size=4096)
+        if model == 'three':
+            model_pred = model.predict([test_tokenized,test_tokenized_small,test_tokenized_features], batch_size=4096)
+        else:
+            model_pred = model.predict(test_tokenized, batch_size=4096)
 
         with open('predictions/' + lang + '_' + val_acc + '_.pickle', 'wb') as handle:
             pickle.dump(model_pred, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -71,6 +81,7 @@ def parse_args(args):
     parser.add_argument('--es_weight', help='Path to spanish weight')
     parser.add_argument('--name', help="Name of csv submission", default="submission")
     parser.add_argument("--cpu", default=False, type=bool)
+    parser.add_argument("--model", default='normal', help='Type of model')
 
     return parser.parse_args(args)
 
@@ -91,4 +102,4 @@ if __name__ == '__main__':
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-    predict(languages,args.pt_weight,args.es_weight,train,test,args.name)
+    predict(languages,args.pt_weight,args.es_weight,train,test,args.name,args.model)
