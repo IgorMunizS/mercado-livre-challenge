@@ -51,9 +51,7 @@ def predict(languages, pt_weight,es_weight,train,test,name,type_model):
         model = keras.models.load_model(model_path, custom_objects=custom_objects)
 
         if type_model == 'three':
-            inputs = [np.array(test_tokenized),np.array(test_tokenized_small),np.array(test_tokenized_features)]
-            print(len(inputs))
-            model_pred = model.predict([inputs], batch_size=4096)
+            model_pred = model.predict([test_tokenized,test_tokenized_small,test_tokenized_features], batch_size=4096)
         else:
             model_pred = model.predict(test_tokenized, batch_size=4096)
 
