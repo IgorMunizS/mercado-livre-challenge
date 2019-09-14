@@ -44,7 +44,7 @@ class DataGenerator(keras.utils.Sequence):
         else:
             X_temp = []
             for i in range(len(self.X)):
-                x_temp = [self.X[i,k] for k in indexes]
+                x_temp = [self.X[i][k] for k in indexes]
                 X_temp.append(x_temp)
 
 
@@ -75,7 +75,7 @@ class DataGenerator(keras.utils.Sequence):
 
         if self.mode == 'three':
             X =[]
-            for i in range(len(self.X)):
+            for i in range(len(x)):
                 X.append(np.array(x[i]))
 
         else:
