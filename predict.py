@@ -9,6 +9,7 @@ from utils.utils import focal_loss
 import pickle
 import keras
 from keras_radam import RAdam
+import numpy as np
 
 
 def predict(languages, pt_weight,es_weight,train,test,name,model):
@@ -50,7 +51,8 @@ def predict(languages, pt_weight,es_weight,train,test,name,model):
         model = keras.models.load_model(model_path, custom_objects=custom_objects)
 
         if model == 'three':
-            model_pred = model.predict([test_tokenized,test_tokenized_small,test_tokenized_features], batch_size=4096)
+            inputs = [np.array(test_tokenized),np.array(test_tokenized_small),np.array(test_tokenized_features)]
+            model_pred = model.predict(inputs, batch_size=4096)
         else:
             model_pred = model.predict(test_tokenized, batch_size=4096)
 
