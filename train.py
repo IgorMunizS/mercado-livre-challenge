@@ -79,8 +79,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val,  X_train_2, X_val_2, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_2, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train_2, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
-                val_generator = DataGenerator([X_val_2,X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val,X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
 
             else:
 
