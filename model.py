@@ -67,21 +67,21 @@ def get_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
     return model
 
 def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_classes):
-    sequence_input = Input(shape=(maxlen,))
+    # sequence_input = Input(shape=(maxlen,))
     small_sequence_input = Input(shape=(6,))
     features_input = Input(shape=(7,))
 
-    embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False, name='embedding_layer')(sequence_input)
-
-    x = SpatialDropout1D(0.3)(embedding_1)
+    # embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False, name='embedding_layer')(sequence_input)
+    #
+    # x = SpatialDropout1D(0.3)(embedding_1)
     # x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
     # x2 = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
     # max_pool1 = GlobalMaxPooling1D()(x1)
     # max_pool2 = GlobalMaxPooling1D()(x2)
 
-    x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
-    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
-    max_pool1 = GlobalMaxPooling1D()(x)
+    # x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
+    # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
+    # max_pool1 = GlobalMaxPooling1D()(x)
 
 
     embedding_2 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False,
@@ -89,25 +89,26 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
 
     x = SpatialDropout1D(0.3)(embedding_2)
 
-    x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
-    x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
-    max_pool2 = GlobalMaxPooling1D()(x)
+    # x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
+    # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
+    # max_pool2 = GlobalMaxPooling1D()(x)
 
-    # x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
-    # x2 = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
-    # max_pool3 = GlobalMaxPooling1D()(x1)
-    # max_pool4 = GlobalMaxPooling1D()(x2)
+    x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
+    x2 = Bidirectional(CuDNNGRU(128, return_sequences=True))(x1)
+    max_pool3 = GlobalMaxPooling1D()(x1)
+    max_pool4 = GlobalMaxPooling1D()(x2)
 
     features_dense = Dense(64, activation="relu")(features_input)
 
-    # x = concatenate([max_pool1, max_pool2,max_pool3,max_pool4,features_dense])
+    x = concatenate([max_pool3,max_pool4,features_dense])
 
-    x = concatenate([max_pool1, max_pool2,features_dense])
-    x = Dense(128, activation='relu')(x)
-    x = Dropout(0.2)(x)
-    x = BatchNormalization()(x)
+    # x = concatenate([max_pool1, max_pool2,features_dense])
+    # x = Dense(128, activation='relu')(x)
+    # x = Dropout(0.2)(x)
+    # x = BatchNormalization()(x)
+
     preds = Dense(n_classes, activation="softmax")(x)
-    model = Model(inputs=[sequence_input,small_sequence_input,features_input], outputs=preds)
+    model = Model(inputs=[small_sequence_input,features_input], outputs=preds)
 
     return model
 
