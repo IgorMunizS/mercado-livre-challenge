@@ -5,6 +5,8 @@ from utils.features import build_features
 import pandas as pd
 import argparse
 import sys
+from tqdm import tqdm
+tqdm.pandas()
 
 def tokenize(X_train,X_test,max_features, maxlen, lang):
     print("Tokenizando")
