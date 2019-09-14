@@ -108,7 +108,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     # x = BatchNormalization()(x)
 
     preds = Dense(n_classes, activation="softmax")(x)
-    model = Model(inputs=[small_sequence_input,features_input], outputs=preds)
+    model = Model(inputs=[sequence_input,small_sequence_input,features_input], outputs=preds)
 
     return model
 
