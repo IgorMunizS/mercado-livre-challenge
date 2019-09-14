@@ -12,7 +12,7 @@ from keras_radam import RAdam
 import numpy as np
 
 
-def predict(languages, pt_weight,es_weight,train,test,name,model):
+def predict(languages, pt_weight,es_weight,train,test,name,type_model):
 
     submission = pd.DataFrame()
 
@@ -26,7 +26,7 @@ def predict(languages, pt_weight,es_weight,train,test,name,model):
         with open('../tokenizers/' + lang +'_tokenizer.pickle', 'rb') as handle:
             test_tokenized = pickle.load(handle)
 
-        if model == 'three':
+        if type_model == 'three':
             with open('../tokenizers/' + lang + '_small_tokenizer.pickle', 'rb') as handle:
                 test_tokenized_small = pickle.load(handle)
 
@@ -50,7 +50,7 @@ def predict(languages, pt_weight,es_weight,train,test,name,model):
 
         model = keras.models.load_model(model_path, custom_objects=custom_objects)
 
-        if model == 'three':
+        if type_model == 'three':
             inputs = [np.array(test_tokenized),np.array(test_tokenized_small),np.array(test_tokenized_features)]
             print(len(inputs))
             model_pred = model.predict([inputs], batch_size=4096)
