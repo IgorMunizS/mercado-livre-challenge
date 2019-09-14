@@ -52,7 +52,8 @@ def predict(languages, pt_weight,es_weight,train,test,name,model):
 
         if model == 'three':
             inputs = [np.array(test_tokenized),np.array(test_tokenized_small),np.array(test_tokenized_features)]
-            model_pred = model.predict(inputs, batch_size=4096)
+            print(len(inputs))
+            model_pred = model.predict([inputs], batch_size=4096)
         else:
             model_pred = model.predict(test_tokenized, batch_size=4096)
 
