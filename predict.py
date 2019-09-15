@@ -5,7 +5,7 @@ import argparse
 import sys
 
 from utils.layers import  AttentionWithContext
-from utils.utils import focal_loss
+from utils.utils import focal_loss, label_smooth_loss
 import pickle
 import keras
 from keras_radam import RAdam
@@ -38,6 +38,7 @@ def predict(languages, pt_weight,es_weight,train,test,name,type_model):
             'RAdam': RAdam,
             'focal_loss': focal_loss,
             'AttentionWithContext' : AttentionWithContext,
+            'label_smooth_loss' : label_smooth_loss
         }
 
         if lang == 'portuguese':
