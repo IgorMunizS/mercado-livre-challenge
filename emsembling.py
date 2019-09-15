@@ -30,7 +30,7 @@ def emsemble(folder):
                 val_acc = predict.split('_')[1]
 
                 if lang == language:
-                    with open('predictions/' + predict, 'rb') as handle:
+                    with open(folder + predict, 'rb') as handle:
                         model_predict = pickle.load(handle)
                     model_predict_list.append(model_predict*float(val_acc))
                     val_acc_list.append(float(val_acc))
