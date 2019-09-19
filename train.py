@@ -12,7 +12,7 @@ from sklearn.utils import class_weight
 import argparse
 import sys
 import numpy as np
-from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell
+from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell, normalize_title
 from utils.features import build_features
 from tqdm import tqdm
 tqdm.pandas()
@@ -30,10 +30,12 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
 
         if type_model == 'three':
             train_new = build_features(train_new)
@@ -277,6 +279,7 @@ def parse_args(args):
 
     parser.add_argument('--model', help='Local of training', default='normal')
     parser.add_argument('--pre', help='Pretraining with only reliable values', default=False, type=bool)
+    parser.add_argument('--language', help='Training only in a specific language', default='both')
 
 
     return parser.parse_args(args)
@@ -285,15 +288,21 @@ if __name__ == '__main__':
     train = pd.read_csv("../../dados/train.csv")
     test = pd.read_csv("../../dados/test.csv")
 
+    args = sys.argv[1:]
+    args = parse_args(args)
+
     EMBEDDING = {"spanish": ["../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec",
                              "../../../harold/word_embeddings/espanhol/fasttext-sbwc.vec"],
 
                  "portuguese": ["../../../harold/word_embeddings/portugues/glove_s300.txt",
                                 "../../../harold/word_embeddings/portugues/skip_s300.txt"]}
 
-    languages = ['portuguese', 'spanish']
+    if args.language == 'both':
+        languages = ['portuguese', 'spanish']
+    else:
+        languages = []
+        languages.append(args.language)
 
-    args = sys.argv[1:]
-    args = parse_args(args)
+
 
     training(languages,EMBEDDING,train,test,args.model, args.pre)

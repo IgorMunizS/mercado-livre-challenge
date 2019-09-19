@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 mispell_dict_pt = {'c/':'com',
                 's/':'sem',
@@ -107,4 +108,7 @@ def clean_text(x):
     for punct in '?!.,"#$%\'()*+-/:;<=>@[\\]^_`{|}~' + '“”’':
         x = x.replace(punct, '')
     return x
+
+def normalize_title(title):
+    return unicodedata.normalize('NFKD', title.lower()).encode('ASCII', 'ignore').decode('utf8')
 
