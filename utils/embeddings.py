@@ -415,10 +415,12 @@ def char_vectorizer(tok,max_features,text):
                                  tokenizer=None, vocabulary=None)
     vectorizer.fit(text)
 
+    embed_size = len(vectorizer.vocabulary_)
+
     word_index = tok.word_index
     # prepare embedding matrix
     num_words = min(max_features, len(word_index) + 1)
-    embedding_matrix = np.zeros((num_words, 100))
+    embedding_matrix = np.zeros((num_words, embed_size))
     for key, i in word_index.items():
         if i >= max_features:
             continue
