@@ -21,18 +21,19 @@ from utils.utils import label_smooth_loss
 def training(languages, EMBEDDING,train,test,type_model,pre):
 
     for lang in languages:
+        print('Training ',lang)
         train_new = train[train["language"] == lang]
         test_new = test[test["language"] == lang]
 
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
 
-        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
-        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
