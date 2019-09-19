@@ -50,9 +50,12 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
+        text = (X_train.tolist() + X_test.tolist())
+
         max_features = 100000
         maxlen = 15
         embed_size = 300
+        char_embed_size = 100
         batch_size = 512
 
 
@@ -60,7 +63,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         if pre:
             X_train = train_new[train_new['label_quality'] == 'reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
-            text = X_train.tolist()
+
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
@@ -98,10 +101,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
             if type_model == 'small':
-                model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
+                model = get_small_model(maxlen, max_features, 2*embed_size + char_embed_size, embedding_matrix, len(classes))
 
             elif type_model == 'three':
-                model = get_three_entrys_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
+                model = get_three_entrys_model(maxlen, max_features, 2*embed_size + char_embed_size, embedding_matrix, len(classes))
 
             else:
                 model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
@@ -134,8 +137,6 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             X_train = train_new['title']
 
             Y_train = train_new['category'].values
-            text = (X_train.tolist() + X_test.tolist())
-
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
