@@ -405,27 +405,33 @@ def meta_embedding(tok,embedding_file,max_features,embed_size):
         embedding_matrix[i] = unknown_vector
     return embedding_matrix
 
-def char_vectorizer(tok,max_features,text):
+class CharVectorizer:
 
-    vectorizer = CountVectorizer(analyzer='char', binary=False, decode_error='strict',
-                                 encoding='utf-8', input='content',
-                                 lowercase=True, max_df=1.0, max_features=100, min_df=1,
-                                 ngram_range=(1, 1), preprocessor=None, stop_words=None,
-                                 strip_accents=None, token_pattern='(?u)\\b\\w\\w+\\b',
-                                 tokenizer=None, vocabulary=None)
-    vectorizer.fit(text)
+    def __init__(self, max_features,text):
 
-    embed_size = len(vectorizer.vocabulary_)
+        self.text = text
+        self.max_features = max_features
 
-    word_index = tok.word_index
-    # prepare embedding matrix
-    num_words = min(max_features, len(word_index) + 1)
-    embedding_matrix = np.zeros((num_words, embed_size))
-    for key, i in word_index.items():
-        if i >= max_features:
-            continue
-        word = key
-        embedding_vector = vectorizer.transform([str(word)]).toarray().astype(np.float32)
-        embedding_matrix[i] = embedding_vector
+        self.vectorizer = CountVectorizer(analyzer='char', binary=False, decode_error='strict',
+                                     encoding='utf-8', input='content',
+                                     lowercase=True, max_df=1.0, max_features=100, min_df=1,
+                                     ngram_range=(1, 1), preprocessor=None, stop_words=None,
+                                     strip_accents=None, token_pattern='(?u)\\b\\w\\w+\\b',
+                                     tokenizer=None, vocabulary=None)
+        self.vectorizer.fit(self.text)
+        self.embed_size = len(self.vectorizer.vocabulary_)
 
-    return embedding_matrix
+    def get_char_embedding(self,tok):
+
+        word_index = tok.word_index
+        # prepare embedding matrix
+        num_words = min(self.max_features, len(word_index) + 1)
+        embedding_matrix = np.zeros((num_words, self.embed_size))
+        for key, i in word_index.items():
+            if i >= self.max_features:
+                continue
+            word = key
+            embedding_vector = self.vectorizer.transform([str(word)]).toarray().astype(np.float32)
+            embedding_matrix[i] = embedding_vector
+
+        return embedding_matrix

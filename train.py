@@ -6,7 +6,7 @@ from keras_radam import RAdam
 from generator import DataGenerator
 from model import get_model, get_small_model, get_three_entrys_model
 from utils.tokenizer import tokenize, save_multi_inputs
-from utils.embeddings import meta_embedding, char_vectorizer
+from utils.embeddings import meta_embedding, CharVectorizer
 from utils.callbacks import Lookahead, CyclicLR
 from sklearn.utils import class_weight
 import argparse
@@ -31,12 +31,12 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
-        train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
+        # train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
         # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
-        test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
+        # test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
 
         if type_model == 'three':
             train_new = build_features(train_new)
@@ -52,12 +52,15 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         text = (X_train.tolist() + X_test.tolist())
 
+
+
         max_features = 100000
         maxlen = 15
         embed_size = 300
-        char_embed_size = 100
         batch_size = 512
 
+        char_vectorizer = CharVectorizer(max_features,text)
+        char_embed_size = char_vectorizer.embed_size
 
 
         if pre:
@@ -70,7 +73,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
 
-            char_embedding = char_vectorizer(tok,max_features,text)
+            char_embedding = char_vectorizer.get_char_embedding(tok)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
@@ -142,7 +145,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-            char_embedding = char_vectorizer(tok, max_features, text)
+            char_embedding = char_vectorizer.get_char_embedding(tok)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
