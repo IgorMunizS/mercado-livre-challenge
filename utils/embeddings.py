@@ -1,4 +1,5 @@
 from typing import Optional, List
+from sklearn.feature_extraction.text import CountVectorizer
 
 import numpy as np
 import tensorflow as tf
@@ -402,4 +403,27 @@ def meta_embedding(tok,embedding_file,max_features,embed_size):
             continue
 
         embedding_matrix[i] = unknown_vector
+    return embedding_matrix
+
+def char_vectorizer(tok,max_features,text):
+
+    vectorizer = CountVectorizer(analyzer='char', binary=False, decode_error='strict',
+                                 encoding='utf-8', input='content',
+                                 lowercase=True, max_df=1.0, max_features=100, min_df=1,
+                                 ngram_range=(1, 1), preprocessor=None, stop_words=None,
+                                 strip_accents=None, token_pattern='(?u)\\b\\w\\w+\\b',
+                                 tokenizer=None, vocabulary=None)
+    vectorizer.fit(text)
+
+    word_index = tok.word_index
+    # prepare embedding matrix
+    num_words = min(max_features, len(word_index) + 1)
+    embedding_matrix = np.zeros((num_words, 100))
+    for key, i in word_index.items():
+        if i >= max_features:
+            continue
+        word = key
+        embedding_vector = vectorizer.transform([str(word)]).toarray().astype(np.float32)
+        embedding_matrix[i] = embedding_vector
+
     return embedding_matrix
