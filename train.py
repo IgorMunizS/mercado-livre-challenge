@@ -28,15 +28,15 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
 
-        # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
-        # train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
-        # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
-        # train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
-        #
-        # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
-        # test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
-        # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
-        # test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
+
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
 
         if type_model == 'three':
             train_new = build_features(train_new)
@@ -50,7 +50,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 50000
+        max_features = 200000
         maxlen = 20
         embed_size = 300
         batch_size = 512
