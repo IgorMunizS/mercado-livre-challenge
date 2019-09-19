@@ -86,7 +86,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     # max_pool1 = GlobalMaxPooling1D()(x)
 
 
-    embedding_2 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=True,
+    embedding_2 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False,
                             name='small_embedding_layer')(small_sequence_input)
 
     x = SpatialDropout1D(0.3)(embedding_2)
