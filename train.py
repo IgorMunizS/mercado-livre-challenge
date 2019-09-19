@@ -50,7 +50,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 200000
+        max_features = 120000
         maxlen = 20
         embed_size = 300
         batch_size = 512
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     args = parse_args(args)
 
     EMBEDDING = {"spanish": ["../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec",
-                             "../../../harold/word_embeddings/espanhol/fasttext-sbwc.vec"],
+                             "../../../harold/word_embeddings/espanhol/fasttext-nlarge-suc.vec"],
 
                  "portuguese": ["../../../harold/word_embeddings/portugues/glove_s300.txt",
                                 "../../../harold/word_embeddings/portugues/skip_s300.txt"]}
