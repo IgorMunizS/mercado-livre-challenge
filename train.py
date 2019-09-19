@@ -60,13 +60,13 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         if pre:
             X_train = train_new[train_new['label_quality'] == 'reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
-
+            text = X_train.tolist()
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-            text = X_train.tolist()
+
             char_embedding = char_vectorizer(tok,max_features,text)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
@@ -134,12 +134,13 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             X_train = train_new['title']
 
             Y_train = train_new['category'].values
+            text = (X_train.tolist() + X_test.tolist())
+
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
 
-            text = (X_train.tolist() + X_test.tolist())
             char_embedding = char_vectorizer(tok, max_features, text)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
