@@ -28,6 +28,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
 
+        if type_model == 'three':
+            train_new = build_features(train_new)
+            test_new = build_features(test_new)
+
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
@@ -38,9 +42,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
 
-        if type_model == 'three':
-            train_new = build_features(train_new)
-            test_new = build_features(test_new)
+
 
         X_train = train_new['title']
 
