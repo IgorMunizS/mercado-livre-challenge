@@ -1,5 +1,7 @@
 from typing import Optional, List
 from sklearn.feature_extraction.text import CountVectorizer
+from nltk.stem import SnowballStemmer
+
 
 import numpy as np
 import tensorflow as tf
@@ -360,8 +362,9 @@ class ContextualDynamicMetaEmbedding(tf.keras.layers.Layer):
         return cls(embedding_matrices=embedding_matrices, **config)
 
 
-def meta_embedding(tok,embedding_file,max_features,embed_size):
+def meta_embedding(tok,embedding_file,max_features,embed_size,lang):
     print("Gerando Glove Embedding")
+    snowball_stemmer = SnowballStemmer(lang)
 
     embeddings_index = {}
     with open(embedding_file, encoding='utf8') as f:
@@ -375,7 +378,7 @@ def meta_embedding(tok,embedding_file,max_features,embed_size):
     # prepare embedding matrix
     num_words = min(max_features, len(word_index) + 1)
     embedding_matrix = np.zeros((num_words, embed_size))
-    unknown_vector = np.random.uniform(size=embed_size)
+    unknown_vector = np.random.normal(size=embed_size)
     # unknown_vector = np.zeros((embed_size,), dtype=np.float32) - 1.
     # print(unknown_vector[:5])
     for key, i in word_index.items():
@@ -397,6 +400,11 @@ def meta_embedding(tok,embedding_file,max_features,embed_size):
             embedding_matrix[i] = embedding_vector
             continue
         word = key.capitalize()
+        embedding_vector = embeddings_index.get(word)
+        if embedding_vector is not None:
+            embedding_matrix[i] = embedding_vector
+            continue
+        word = snowball_stemmer.stemmer(key)
         embedding_vector = embeddings_index.get(word)
         if embedding_vector is not None:
             embedding_matrix[i] = embedding_vector
