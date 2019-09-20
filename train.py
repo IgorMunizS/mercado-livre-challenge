@@ -28,6 +28,9 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
 
+        #Generate char embedding without preprocess
+        text = (train_new['title'].tolist() + test_new["title"].tolist())
+
         if type_model == 'three':
             train_new = build_features(train_new)
             test_new = build_features(test_new)
@@ -52,10 +55,6 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        text = (X_train.tolist() + X_test.tolist())
-
-
-
         max_features = 100000
         maxlen = 20
         embed_size = 300
@@ -71,8 +70,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
-            glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
-            fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
+            glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
+            fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
 
 
             char_embedding = char_vectorizer.get_char_embedding(tok)
@@ -144,8 +143,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             Y_train = train_new['category'].values
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
-            glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size)
-            fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size)
+            glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
+            fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
 
             char_embedding = char_vectorizer.get_char_embedding(tok)
 
