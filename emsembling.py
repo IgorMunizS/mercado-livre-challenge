@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import sys
 import argparse
+import time
 
 def emsemble(folder):
 
@@ -48,7 +49,10 @@ def emsemble(folder):
         test_new['category'] = model_pred_class
         submission = submission.append(test_new[['id', 'category']])
 
-        name = name + str(language) + '_'.join([str(i) for i in val_acc_list])
+        name = name + str(language) + '_' + str(len(val_acc_list))
+
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    name = name + '_' + timestr
 
     submission.to_csv('submissions/' + name + '.csv', index=False)
 
