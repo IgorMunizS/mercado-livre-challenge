@@ -81,18 +81,20 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix,char_embedding), axis=1)
 
             if type_model == 'three':
-                X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
+                # X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
                 X_train_3 = train_new[train_new['label_quality'] == 'reliable']\
-                            [['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
+                            [['n_words','length', 'n_chars_word','n_capital_letters','n_numbers','small_length',
+                              'small_n_chars_word','small_n_capital_letters','small_n_numbers',
+                              'numbers', 'sum_numbers', 'mean_numbers']].values
 
-                X_train_2 = tok.texts_to_sequences(X_train_2)
-                X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
+                # X_train_2 = tok.texts_to_sequences(X_train_2)
+                # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
 
 
-                X_train, X_val,  X_train_2, X_val_2, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_2, X_train_3, Y_train, train_size=0.9, random_state=233)
+                X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_2, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
-                val_generator = DataGenerator([X_val, X_val_2, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
 
             else:
 
@@ -158,23 +160,27 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                                                               Y_train)
 
             if type_model == 'three':
-                X_train_2 = train_new['small_title']
-                X_train_3 = train_new[['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
+                # X_train_2 = train_new['small_title']
+                X_train_3 = train_new[['n_words','length', 'n_chars_word','n_capital_letters','n_numbers','small_length',
+                              'small_n_chars_word','small_n_capital_letters','small_n_numbers',
+                              'numbers', 'sum_numbers', 'mean_numbers']].values
 
-                X_train_2 = tok.texts_to_sequences(X_train_2)
-                X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
+                # X_train_2 = tok.texts_to_sequences(X_train_2)
+                # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
 
                 X_test_small = test_new["small_title"]
                 X_test_small = tok.texts_to_sequences(X_test_small)
                 X_test_small = sequence.pad_sequences(X_test_small, maxlen=6)
-                X_test_features =  test_new[['n_words','length','n_capital_letters','n_numbers','small_length','small_n_capital_letters','small_n_numbers']].values
+                X_test_features =  test_new[['n_words','length', 'n_chars_word','n_capital_letters','n_numbers','small_length',
+                              'small_n_chars_word','small_n_capital_letters','small_n_numbers',
+                              'numbers', 'sum_numbers', 'mean_numbers']].values
 
                 save_multi_inputs(X_test_small,X_test_features, lang)
 
-                X_train, X_val,  X_train_2, X_val_2, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_2, X_train_3, Y_train, train_size=0.9, random_state=233)
+                X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_2, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
-                val_generator = DataGenerator([X_val,X_val_2, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
                 model.get_layer('embedding_layer').set_weights([embedding_matrix])
                 model.get_layer('small_embedding_layer').set_weights([embedding_matrix])
 
