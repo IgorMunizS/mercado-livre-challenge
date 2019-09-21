@@ -75,13 +75,28 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
 
     embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=True, name='embedding_layer')(sequence_input)
 
-    x = SpatialDropout1D(0.2)(embedding_1)
+    x = SpatialDropout1D(0.3)(embedding_1)
     x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
-    x2 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x1)
+    x2 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x1)
     x3 = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x2)
+    x4 = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
+
     max_pool1 = GlobalMaxPooling1D()(x1)
     max_pool2 = GlobalMaxPooling1D()(x2)
     max_pool3 = GlobalMaxPooling1D()(x3)
+    max_pool4 = GlobalMaxPooling1D()(x4)
+
+    x1 = SpatialDropout1D(0.3)(embedding_1)
+
+    x = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x1)
+
+    x = Bidirectional(CuDNNLSTM(64, return_sequences=True))(x)
+
+    x = AttentionWithContext()(x)
+    x = Dense(64, activation="relu")(x)
+
+    average_pool_attention = GlobalAveragePooling1D()(x)
+
 
     # x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
     # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
@@ -107,7 +122,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
 
     features_dense = Dense(256, activation="relu")(features_input)
 
-    x = concatenate([max_pool1,max_pool2,max_pool3,features_dense])
+    x = concatenate([max_pool1,max_pool2,max_pool3,max_pool4,average_pool_attention,features_dense])
 
     # x = concatenate([max_pool1, max_pool2,features_dense])
     # x = Dense(128, activation='relu')(concat)

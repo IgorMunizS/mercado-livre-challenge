@@ -52,7 +52,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 200000
+        max_features = 120000
         maxlen = 20
         embed_size = 300
         batch_size = 512
