@@ -108,10 +108,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
             if type_model == 'small':
-                model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
+                model = get_small_model(maxlen, max_features, 2*embed_size + char_embed_size, embedding_matrix, len(classes))
 
             elif type_model == 'three':
-                model = get_three_entrys_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
+                model = get_three_entrys_model(maxlen, max_features, 2*embed_size + char_embed_size, embedding_matrix, len(classes))
 
             else:
                 model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
