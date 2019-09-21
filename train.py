@@ -59,10 +59,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         batch_size = 512
 
         # Generate char embedding without preprocess
-        text = (train_new['title'].tolist() + test_new["title"].tolist())
+        # text = (train_new['title'].tolist() + test_new["title"].tolist())
 
-        char_vectorizer = CharVectorizer(max_features,text)
-        char_embed_size = char_vectorizer.embed_size
+        # char_vectorizer = CharVectorizer(max_features,text)
+        # char_embed_size = char_vectorizer.embed_size
 
 
         if pre:
@@ -75,11 +75,11 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
 
 
-            char_embedding = char_vectorizer.get_char_embedding(tok)
+            # char_embedding = char_vectorizer.get_char_embedding(tok)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
-            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix,char_embedding), axis=1)
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
 
             if type_model == 'three':
                 # X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
@@ -108,10 +108,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
             if type_model == 'small':
-                model = get_small_model(maxlen, max_features, 2*embed_size + char_embed_size, embedding_matrix, len(classes))
+                model = get_small_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
 
             elif type_model == 'three':
-                model = get_three_entrys_model(maxlen, max_features, 2*embed_size + char_embed_size, embedding_matrix, len(classes))
+                model = get_three_entrys_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
 
             else:
                 model = get_model(maxlen, max_features, 2*embed_size, embedding_matrix, len(classes))
@@ -149,11 +149,11 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
 
-            char_embedding = char_vectorizer.get_char_embedding(tok)
+            # char_embedding = char_vectorizer.get_char_embedding(tok)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
-            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix,char_embedding), axis=1)
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
 
 
             class_weights = class_weight.compute_class_weight('balanced',
