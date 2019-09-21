@@ -28,8 +28,6 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
 
-        #Generate char embedding without preprocess
-        text = (train_new['title'].tolist() + test_new["title"].tolist())
 
         if type_model == 'three':
             train_new = build_features(train_new)
@@ -59,6 +57,9 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         maxlen = 20
         embed_size = 300
         batch_size = 512
+
+        # Generate char embedding without preprocess
+        text = (train_new['title'].tolist() + test_new["title"].tolist())
 
         char_vectorizer = CharVectorizer(max_features,text)
         char_embed_size = char_vectorizer.embed_size
