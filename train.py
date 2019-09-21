@@ -83,9 +83,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             if type_model == 'three':
                 # X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
-                X_train_3 = train_new[train_new['label_quality'] == 'reliable']\
-                            [['n_words','length','n_capital_letters','n_numbers','small_length',
-                              'small_n_capital_letters','small_n_numbers']].values
+                X_train_3 = train_new[train_new['label_quality'] == 'reliable'] \
+                    [['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
+                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers',
+                      'numbers', 'sum_numbers', 'mean_numbers']].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
@@ -161,8 +162,9 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             if type_model == 'three':
                 # X_train_2 = train_new['small_title']
-                X_train_3 = train_new[['n_words','length','n_capital_letters','n_numbers','small_length',
-                              'small_n_capital_letters','small_n_numbers']].values
+                X_train_3 = train_new[['n_words','length', 'n_chars_word','n_capital_letters','n_numbers','small_length',
+                              'small_n_chars_word','small_n_capital_letters','small_n_numbers',
+                              'numbers', 'sum_numbers', 'mean_numbers']].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
