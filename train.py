@@ -28,6 +28,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
 
+        # Generate char embedding without preprocess
+        text = (train_new['title'].tolist() + test_new["title"].tolist())
 
         if type_model == 'three':
             train_new = build_features(train_new)
@@ -58,11 +60,10 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         embed_size = 300
         batch_size = 512
 
-        # Generate char embedding without preprocess
-        # text = (train_new['title'].tolist() + test_new["title"].tolist())
 
-        # char_vectorizer = CharVectorizer(max_features,text)
-        # char_embed_size = char_vectorizer.embed_size
+
+        char_vectorizer = CharVectorizer(max_features,text)
+        char_embed_size = char_vectorizer.embed_size
 
 
         if pre:
@@ -75,18 +76,17 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
 
 
-            # char_embedding = char_vectorizer.get_char_embedding(tok)
+            char_embedding = char_vectorizer.get_char_embedding(tok)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
-            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix, char_embedding), axis=1)
 
             if type_model == 'three':
                 # X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
                 X_train_3 = train_new[train_new['label_quality'] == 'reliable'] \
                     [['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
-                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers',
-                      'numbers', 'sum_numbers', 'mean_numbers']].values
+                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers']].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
@@ -149,11 +149,11 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
 
-            # char_embedding = char_vectorizer.get_char_embedding(tok)
+            char_embedding = char_vectorizer.get_char_embedding(tok)
 
             # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
-            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix), axis=1)
+            embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix, char_embedding), axis=1)
 
 
             class_weights = class_weight.compute_class_weight('balanced',
@@ -162,9 +162,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             if type_model == 'three':
                 # X_train_2 = train_new['small_title']
-                X_train_3 = train_new[['n_words','length', 'n_chars_word','n_capital_letters','n_numbers','small_length',
-                              'small_n_chars_word','small_n_capital_letters','small_n_numbers',
-                              'numbers', 'sum_numbers', 'mean_numbers']].values
+                X_train_3 = train_new[['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
+                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers']].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
@@ -172,9 +171,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 X_test_small = test_new["small_title"]
                 X_test_small = tok.texts_to_sequences(X_test_small)
                 X_test_small = sequence.pad_sequences(X_test_small, maxlen=6)
-                X_test_features =  test_new[['n_words','length', 'n_chars_word','n_capital_letters','n_numbers','small_length',
-                              'small_n_chars_word','small_n_capital_letters','small_n_numbers',
-                              'numbers', 'sum_numbers', 'mean_numbers']].values
+                X_test_features =  test_new[['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
+                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers']].values
 
                 save_multi_inputs(X_test_small,X_test_features, lang)
 
