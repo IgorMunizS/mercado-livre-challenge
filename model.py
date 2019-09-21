@@ -93,9 +93,9 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     x = Bidirectional(CuDNNLSTM(64, return_sequences=True))(x)
 
     x = AttentionWithContext()(x)
-    x = Dense(64, activation="relu")(x)
+    dense_attention = Dense(64, activation="relu")(x)
 
-    average_pool_attention = GlobalAveragePooling1D()(x)
+    # average_pool_attention = GlobalAveragePooling1D()(x)
 
 
     # x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
@@ -122,7 +122,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
 
     features_dense = Dense(256, activation="relu")(features_input)
 
-    x = concatenate([max_pool1,max_pool2,max_pool3,max_pool4,average_pool_attention,features_dense])
+    x = concatenate([max_pool1,max_pool2,max_pool3,max_pool4,dense_attention,features_dense])
 
     # x = concatenate([max_pool1, max_pool2,features_dense])
     # x = Dense(128, activation='relu')(concat)
