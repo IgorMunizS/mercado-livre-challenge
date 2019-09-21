@@ -3,17 +3,26 @@ import re
 
 def get_all_numbers(title):
     numbers_list = re.findall('\d+', title)
-    return int(''.join(numbers_list))
+    if len(numbers_list) > 0:
+        return int(''.join(numbers_list))
+    else:
+        return 0
 
 def sum_all_numbers(title):
     numbers_list = re.findall('\d+', title)
-    numbers_list = [int(x) for x in numbers_list]
-    return sum(numbers_list)
+    if len(numbers_list) > 0:
+        numbers_list = [int(x) for x in numbers_list]
+        return sum(numbers_list)
+    else:
+        return 0
 
 def mean_all_numbers(title):
     numbers_list = re.findall('\d+', title)
-    numbers_list = [int(x) for x in numbers_list]
-    return sum(numbers_list) / len(numbers_list)
+    if len(numbers_list) > 0:
+        numbers_list = [int(x) for x in numbers_list]
+        return sum(numbers_list) / len(numbers_list)
+    else:
+        return 0
 
 
 
