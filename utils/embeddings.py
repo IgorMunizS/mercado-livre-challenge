@@ -404,11 +404,11 @@ def meta_embedding(tok,embedding_file,max_features,embed_size,lang):
         if embedding_vector is not None:
             embedding_matrix[i] = embedding_vector
             continue
-        word = snowball_stemmer.stem(key)
-        embedding_vector = embeddings_index.get(word)
-        if embedding_vector is not None:
-            embedding_matrix[i] = embedding_vector
-            continue
+        # word = snowball_stemmer.stem(key)
+        # embedding_vector = embeddings_index.get(word)
+        # if embedding_vector is not None:
+        #     embedding_matrix[i] = embedding_vector
+        #     continue
 
         embedding_matrix[i] = unknown_vector
     return embedding_matrix
