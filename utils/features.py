@@ -41,7 +41,7 @@ def build_features(df):
 
     # df['numbers'] = df['title'].apply(lambda x: get_all_numbers(x))
     # df['sum_numbers'] = df['title'].apply(lambda x: sum_all_numbers(x))
-    df['mean_numbers'] = df['title'].apply(lambda x: mean_all_numbers(x))
+    # df['mean_numbers'] = df['title'].apply(lambda x: mean_all_numbers(x))
 
 
     return df
