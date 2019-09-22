@@ -39,7 +39,7 @@ def build_features(df):
     df['small_n_capital_letters'] = df['small_title'].apply(lambda x: len(re.findall(r'[A-Z]', x)))
     df['small_n_numbers'] = df['small_title'].apply(lambda x: len(re.findall(r'[0-9]', x)))
 
-    # df['numbers'] = df['title'].apply(lambda x: get_all_numbers(x))
+    df['numbers'] = df['title'].apply(lambda x: get_all_numbers(x))
     # df['sum_numbers'] = df['title'].apply(lambda x: sum_all_numbers(x))
     # df['mean_numbers'] = df['title'].apply(lambda x: mean_all_numbers(x))
 
