@@ -3,7 +3,7 @@ import numpy as np
 import keras
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
-
+from imblearn.under_sampling import AllKNN
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
@@ -25,7 +25,7 @@ class DataGenerator(keras.utils.Sequence):
         self.shuffle = shuffle
         self.train = train
 
-        self.resample = RandomOverSampler(random_state=42)
+        self.resample = AllKNN(random_state=42, n_jobs=42)
 
         self.classes = classes
         self.n_classes = len(self.classes)
