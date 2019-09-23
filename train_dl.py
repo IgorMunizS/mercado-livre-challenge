@@ -34,12 +34,12 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             train_new = build_features(train_new)
             test_new = build_features(test_new)
 
-        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
-        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
@@ -57,7 +57,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         max_features = 20000
         maxlen = 20
         embed_size = 300
-        batch_size = 128
+        batch_size = 32
 
         # Generate char embedding without preprocess
         text = (train_new['title'].tolist() + test_new["title"].tolist())
@@ -134,8 +134,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         callbacks_list = [checkpoint, early, reduce_lr]
 
-        lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
-        lookahead.inject(model)
+        # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+        # lookahead.inject(model)
 
 
         print("Treinando")
