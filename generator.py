@@ -69,14 +69,17 @@ class DataGenerator(keras.utils.Sequence):
         for i in range(len(Y)):
             y[i] = list(self.classes).index(Y[i])
 
+        X_res = np.concatenate((X[0], X[1]), axis=1)
+
+        X_res, y = self.resample.fit_resample(X_res, y)
 
         if self.mode == 'three':
-            X = [np.array(X[0]),np.array(X[1])]
+            X = [X_res[:,:20],X_res[:,20:]]
         else:
 
             X = np.array(X)
 
-        X,y = self.resample.fit_resample(X,y)
+
 
         return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
 
