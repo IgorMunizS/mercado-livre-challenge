@@ -1,6 +1,7 @@
 import numpy as np
 
 import keras
+from imblearn.over_sampling import RandomOverSampler
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -21,6 +22,8 @@ class DataGenerator(keras.utils.Sequence):
         self.dim = dim
         self.batch_size = batch_size
         self.shuffle = shuffle
+
+        self.resample = RandomOverSampler(random_state=42)
 
         self.classes = classes
         self.n_classes = len(self.classes)
@@ -72,6 +75,8 @@ class DataGenerator(keras.utils.Sequence):
         else:
 
             X = np.array(X)
+
+        X,y = self.resample.fit_resample(X,y)
 
         return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
 
