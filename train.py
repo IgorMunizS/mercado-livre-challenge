@@ -92,14 +92,14 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
                 train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
-                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, train=False)
 
             else:
 
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
                 train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-                val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+                val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size,train=False)
 
             opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
@@ -176,7 +176,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
                 train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
-                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model)
+                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, train=False)
                 model.get_layer('embedding_layer').set_weights([embedding_matrix])
                 # model.get_layer('small_embedding_layer').set_weights([embedding_matrix])
 
@@ -185,7 +185,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
 
                 train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-                val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+                val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size, train=False)
 
                 model.layers[1].set_weights([embedding_matrix])
 
@@ -238,7 +238,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
+            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size, train=False)
 
             # opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3)
