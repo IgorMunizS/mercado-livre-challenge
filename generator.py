@@ -8,8 +8,8 @@ from imblearn.under_sampling import AllKNN
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
-    def __init__(self, X, Y=None, classes=None, batch_size=32, dim=(32, 32, 32),
-                 shuffle=True, mode='normal', train=True):
+    def __init__(self, X, Y=None, classes=None, batch_size=32,
+                 shuffle=True, mode='normal', resample=True):
         'Initialization'
         self.mode = mode
         if self.mode == 'normal':
@@ -20,12 +20,11 @@ class DataGenerator(keras.utils.Sequence):
             # self.X_3 = X[2]
 
         self.Y = Y
-        self.dim = dim
         self.batch_size = batch_size
         self.shuffle = shuffle
-        self.train = train
+        self.resample = resample
 
-        self.resample = RandomUnderSampler(random_state=42)
+        self.resampler = RandomUnderSampler(random_state=42)
 
         self.classes = classes
         self.n_classes = len(self.classes)
@@ -71,17 +70,17 @@ class DataGenerator(keras.utils.Sequence):
         for i in range(len(Y)):
             y[i] = list(self.classes).index(Y[i])
 
-        if self.train:
+        if self.resample:
             if self.mode == 'three':
                 X_res = np.concatenate((X[0], X[1]), axis=1)
 
-                X_res, y = self.resample.fit_resample(X_res, y)
+                X_res, y = self.resampler.fit_resample(X_res, y)
 
 
                 X = [X_res[:,:20],X_res[:,20:]]
             else:
 
-                X, y = self.resample.fit_resample(X, y)
+                X, y = self.resampler.fit_resample(X, y)
 
         else:
             if self.mode == 'three':
