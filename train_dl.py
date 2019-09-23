@@ -57,7 +57,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         max_features = 20000
         maxlen = 20
         embed_size = 300
-        batch_size = 512
+        batch_size = 128
 
         # Generate char embedding without preprocess
         text = (train_new['title'].tolist() + test_new["title"].tolist())
@@ -85,14 +85,14 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-            train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model)
+            train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,train=False)
             val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, train=False)
 
         else:
 
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
-            train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
+            train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size,train=False)
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size,train=False)
 
         if type_model == 'small':
@@ -109,7 +109,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         class_weights = class_weight.compute_class_weight('balanced',
                                                           classes,
                                                           Y_train)
-        opt = RAdam(lr=0.001)
+        opt = Adam(lr=0.001)
 
         model.compile(loss=label_smooth_loss, optimizer=opt, metrics=['accuracy'])
 
