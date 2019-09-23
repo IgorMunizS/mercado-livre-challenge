@@ -9,7 +9,7 @@ class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
 
     def __init__(self, X, Y=None, classes=None, batch_size=32, dim=(32, 32, 32),
-                 shuffle=True, mode='normal'):
+                 shuffle=True, mode='normal', train=True):
         'Initialization'
         self.mode = mode
         if self.mode == 'normal':
@@ -23,8 +23,9 @@ class DataGenerator(keras.utils.Sequence):
         self.dim = dim
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.train = train
 
-        self.resample = RandomUnderSampler(random_state=42)
+        self.resample = RandomOverSampler(random_state=42)
 
         self.classes = classes
         self.n_classes = len(self.classes)
@@ -70,15 +71,24 @@ class DataGenerator(keras.utils.Sequence):
         for i in range(len(Y)):
             y[i] = list(self.classes).index(Y[i])
 
-        X_res = np.concatenate((X[0], X[1]), axis=1)
+        if self.train:
+            if self.mode == 'three':
+                X_res = np.concatenate((X[0], X[1]), axis=1)
 
-        X_res, y = self.resample.fit_resample(X_res, y)
+                X_res, y = self.resample.fit_resample(X_res, y)
 
-        if self.mode == 'three':
-            X = [X_res[:,:20],X_res[:,20:]]
+
+                X = [X_res[:,:20],X_res[:,20:]]
+            else:
+
+                X, y = self.resample.fit_resample(X, y)
+
         else:
+            if self.mode == 'three':
+                X = [np.array(X[0]), np.array(X[1])]
+            else:
+                X = np.array(X)
 
-            X = np.array(X)
 
 
 
