@@ -101,7 +101,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=False)
                 val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size,resample=False)
 
-            opt = RAdam(lr=1e-3)
+            opt = Adam(lr=1e-3)
             # opt = Nadam(lr=1e-3, schedule_decay=0.005)
             # opt = Adam(lr=1e-3)
             if type_model == 'small':
@@ -190,7 +190,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 model.layers[1].set_weights([embedding_matrix])
 
 
-            opt = RAdam(lr=0.001)
+            opt = Adam(lr=0.001)
 
             model.compile(loss=label_smooth_loss, optimizer=opt, metrics=['accuracy'])
 
