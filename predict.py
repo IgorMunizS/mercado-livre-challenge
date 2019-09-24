@@ -84,21 +84,25 @@ def parse_args(args):
     parser.add_argument('--name', help="Name of csv submission", default="submission")
     parser.add_argument("--cpu", default=False, type=bool)
     parser.add_argument("--model", default='normal', help='Type of model')
+    parser.add_argument('--data_folder', default='../../dados/')
 
     return parser.parse_args(args)
 
 
 if __name__ == '__main__':
-    train = pd.read_csv("../../dados/train.csv")
-    test = pd.read_csv("../../dados/test.csv")
+
+    args = sys.argv[1:]
+    args = parse_args(args)
+
+    train = pd.read_csv(args.data_folder + "train.csv")
+    test = pd.read_csv(args.data_folder + "test.csv")
 
     EMBEDDING = {"spanish": "../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec",
                  "portuguese": "../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec"}
 
     languages = ['portuguese', 'spanish']
 
-    args = sys.argv[1:]
-    args = parse_args(args)
+
 
     if args.cpu:
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
