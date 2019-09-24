@@ -328,6 +328,6 @@ if __name__ == '__main__':
         languages.append(args.language)
 
     if args.small_set:
-        _, train = train_test_split(train, test_size=int(.01 * len(train)), random_state=42, stratify=train.category)
+        _, train = train_test_split(train, test_size=int(.1 * len(train)), random_state=42, stratify=train.category)
 
     training(languages,EMBEDDING,train,test,args.model, args.pre)
