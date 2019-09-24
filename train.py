@@ -32,12 +32,12 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             train_new = build_features(train_new)
             test_new = build_features(test_new)
 
-        # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
-        # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
@@ -52,7 +52,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 50000
+        max_features = 100000
         maxlen = 20
         embed_size = 300
         batch_size = 512
@@ -84,9 +84,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             if type_model == 'three':
                 # X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
-                X_train_3 = train_new[train_new['label_quality'] == 'reliable'] \
-                    [['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
-                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers']].values
+                X_train_3 = train_new[train_new.columns[6:]].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
@@ -162,8 +160,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             if type_model == 'three':
                 # X_train_2 = train_new['small_title']
-                X_train_3 = train_new[['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
-                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers']].values
+                X_train_3 = train_new[train_new.columns[6:]].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
@@ -171,8 +168,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 X_test_small = test_new["small_title"]
                 X_test_small = tok.texts_to_sequences(X_test_small)
                 X_test_small = sequence.pad_sequences(X_test_small, maxlen=6)
-                X_test_features =  test_new[['n_words', 'length', 'n_chars_word', 'n_capital_letters', 'n_numbers', 'small_length',
-                      'small_n_chars_word', 'small_n_capital_letters', 'small_n_numbers']].values
+                X_test_features =  test_new[train_new.columns[5:]].values
 
                 save_multi_inputs(X_test_small,X_test_features, lang)
 
@@ -193,7 +189,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 model.layers[1].set_weights([embedding_matrix])
 
 
-            opt = Adam(lr=0.001)
+            opt = RAdam(lr=0.001)
 
             model.compile(loss=label_smooth_loss, optimizer=opt, metrics=['accuracy'])
 
@@ -218,8 +214,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             callbacks_list = [checkpoint, early, reduce_lr]
 
-            # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
-            # lookahead.inject(model)
+            lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+            lookahead.inject(model)
 
 
             print("Treinando")
