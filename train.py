@@ -294,23 +294,29 @@ def parse_args(args):
 
     parser.add_argument('--model', help='Local of training', default='normal')
     parser.add_argument('--pre', help='Pretraining with only reliable values', default=False, type=bool)
+    parser.add_argument('--small_set', default=False, type=bool)
     parser.add_argument('--language', help='Training only in a specific language', default='both')
+    parser.add_argument('--data_folder', default='../../dados/')
+    parser.add_argument('--embedding_folder', default='../../../harold/word_embeddings/')
+
 
 
     return parser.parse_args(args)
 
 if __name__ == '__main__':
-    train = pd.read_csv("../../dados/train.csv")
-    test = pd.read_csv("../../dados/test.csv")
-
     args = sys.argv[1:]
     args = parse_args(args)
 
-    EMBEDDING = {"spanish": ["../../../harold/word_embeddings/espanhol/glove-sbwc.i25.vec",
-                             "../../../harold/word_embeddings/espanhol/fasttext-nlarge-suc.vec"],
+    train = pd.read_csv(args.data_folder + "train.csv")
+    test = pd.read_csv(args.data_folder + "test.csv")
 
-                 "portuguese": ["../../../harold/word_embeddings/portugues/glove_s300.txt",
-                                "../../../harold/word_embeddings/portugues/skip_s300.txt"]}
+
+
+    EMBEDDING = {"spanish": [args.embedding_folder + "espanhol/glove-sbwc.i25.vec",
+                             args.embedding_folder + "espanhol/fasttext-nlarge-suc.vec"],
+
+                 "portuguese": [args.embedding_folder + "portugues/glove_s300.txt",
+                                args.embedding_folder + "portugues/skip_s300.txt"]}
 
     if args.language == 'both':
         languages = ['portuguese', 'spanish']
@@ -318,6 +324,7 @@ if __name__ == '__main__':
         languages = []
         languages.append(args.language)
 
-
+    if args.small_set:
+        _, train = train_test_split(train, test_size=int(.01 * len(train)), random_state=42, stratify=train.category)
 
     training(languages,EMBEDDING,train,test,args.model, args.pre)
