@@ -218,8 +218,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             callbacks_list = [checkpoint, early, reduce_lr]
 
-            lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
-            lookahead.inject(model)
+            # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+            # lookahead.inject(model)
 
 
             print("Treinando")
