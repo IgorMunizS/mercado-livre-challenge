@@ -84,7 +84,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
             if type_model == 'three':
                 # X_train_2 = train_new[train_new['label_quality'] == 'reliable']['small_title']
-                X_train_3 = train_new[train_new.columns[6:]].values
+                X_train_3 = train_new[train_new['label_quality'] == 'reliable'][train_new.columns[6:]].values
 
                 # X_train_2 = tok.texts_to_sequences(X_train_2)
                 # X_train_2 = sequence.pad_sequences(X_train_2, maxlen=6)
@@ -168,7 +168,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 X_test_small = test_new["small_title"]
                 X_test_small = tok.texts_to_sequences(X_test_small)
                 X_test_small = sequence.pad_sequences(X_test_small, maxlen=6)
-                X_test_features =  test_new[train_new.columns[5:]].values
+                X_test_features =  test_new[test_new.columns[5:]].values
 
                 save_multi_inputs(X_test_small,X_test_features, lang)
 
