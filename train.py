@@ -18,6 +18,9 @@ from tqdm import tqdm
 tqdm.pandas()
 from keras.preprocessing import sequence
 from utils.utils import label_smooth_loss
+from pandarallel import pandarallel
+pandarallel.initialize(shm_size_mb=10000, progress_bar=True, nb_workers=30)
+
 def training(languages, EMBEDDING,train,test,type_model,pre):
 
     for lang in languages:
@@ -34,17 +37,17 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         stopwords = RemoveStopWords(lang)
 
-        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
-        train_new["title"] = train_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
-        train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
-        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
-        train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
+        train_new["title"] = train_new["title"].parallel_apply(lambda x: clean_numbers(x))
+        train_new["title"] = train_new["title"].parallel_apply(lambda x: stopwords.remove_stopwords(x, lang))
+        train_new["title"] = train_new["title"].parallel_apply(lambda x: replace_typical_misspell(x, lang))
+        train_new["title"] = train_new["title"].parallel_apply(lambda x: clean_text(x))
+        train_new["title"] = train_new["title"].parallel_apply(lambda x: normalize_title(x))
 
-        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
-        test_new["title"] = test_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
-        test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
-        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
-        test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
+        test_new["title"] = test_new["title"].parallel_apply(lambda x: clean_numbers(x))
+        test_new["title"] = test_new["title"].parallel_apply(lambda x: stopwords.remove_stopwords(x, lang))
+        test_new["title"] = test_new["title"].parallel_apply(lambda x: replace_typical_misspell(x, lang))
+        test_new["title"] = test_new["title"].parallel_apply(lambda x: clean_text(x))
+        test_new["title"] = test_new["title"].parallel_apply(lambda x: normalize_title(x))
 
 
 
@@ -92,14 +95,14 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=False)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=True)
                 val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
 
             else:
 
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=False)
+                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=True)
                 val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size,resample=False)
 
             opt = Adam(lr=1e-3)
@@ -174,7 +177,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=False)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=True)
                 val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
                 model.get_layer('embedding_layer').set_weights([embedding_matrix])
                 # model.get_layer('small_embedding_layer').set_weights([embedding_matrix])
@@ -183,7 +186,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
 
-                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size,resample=False)
+                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size,resample=True)
                 val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size, resample=False)
 
                 model.layers[1].set_weights([embedding_matrix])
@@ -237,7 +240,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
-            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size, train=False)
+            val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
             # opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3)
