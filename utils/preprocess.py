@@ -151,7 +151,10 @@ def clean_text(x):
 def normalize_title(title):
     return unicodedata.normalize('NFKD', title.lower()).encode('ASCII', 'ignore').decode('utf8')
 
-def remove_stopwords(title,language):
-    cachedStopWords = stopwords.words(language)
+class RemoveStopWords:
+    def __init__(self, language):
+        self.cachedStopWords = stopwords.words(language)
 
-    return ' '.join([word for word in title.split() if word not in cachedStopWords])
+    def remove_stopwords(self,title,language):
+
+        return ' '.join([word for word in title.split() if word not in self.cachedStopWords])
