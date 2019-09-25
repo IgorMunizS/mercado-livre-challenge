@@ -2,6 +2,7 @@ import numpy as np
 
 import keras
 from imblearn.over_sampling import RandomOverSampler
+from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import AllKNN
 
@@ -24,7 +25,7 @@ class DataGenerator(keras.utils.Sequence):
         self.shuffle = shuffle
         self.resample = resample
 
-        self.resampler = RandomUnderSampler(random_state=42)
+        self.resampler = SMOTE(random_state=42)
 
         self.classes = classes
         self.n_classes = len(self.classes)

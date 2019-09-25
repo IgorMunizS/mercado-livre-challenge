@@ -55,7 +55,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         max_features = 100000
         maxlen = 20
         embed_size = 300
-        batch_size = 512
+        batch_size = 4096
 
         # Generate char embedding without preprocess
         text = (train_new['title'].tolist() + test_new["title"].tolist())
@@ -71,10 +71,6 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
             fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size,lang)
-
-            word_index = tok.word_index
-            max_features = min(max_features, len(word_index) + 1)
-
 
             char_embedding = char_vectorizer.get_char_embedding(tok)
 

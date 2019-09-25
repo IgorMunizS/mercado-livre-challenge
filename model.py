@@ -75,7 +75,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
 
     embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=True, name='embedding_layer')(sequence_input)
 
-    x = SpatialDropout1D(0.3)(embedding_1)
+    x = SpatialDropout1D(0.1)(embedding_1)
     x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
     x2 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x1)
     x3 = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x2)
@@ -106,22 +106,22 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     # embedding_2 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False,
     #                         name='small_embedding_layer')(small_sequence_input)
     #
-    x = SpatialDropout1D(0.3)(embedding_1)
+    x = SpatialDropout1D(0.1)(embedding_1)
 
     # x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
     # x = Conv1D(64, kernel_size=2, padding="valid", kernel_initializer="he_uniform")(x1)
     # max_pool2 = GlobalMaxPooling1D()(x)
 
-    x1 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x)
-    x2 = Bidirectional(CuDNNLSTM(128, return_sequences=True))(x1)
+    x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
+    x2 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x1)
 
     avg_pool4 = GlobalAveragePooling1D()(x1)
     avg_pool5 = GlobalAveragePooling1D()(x2)
     max_pool6 = GlobalMaxPooling1D()(x2)
 
     x_concat = concatenate([avg_pool4,avg_pool5,max_pool6])
-    dense_1 = Dense(768, activation='relu')(x_concat)
-    dense_2 = Dense(768, activation='relu')(x_concat)
+    dense_1 = Dense(1024, activation='relu')(x_concat)
+    dense_2 = Dense(1024, activation='relu')(x_concat)
 
     x_concat_2 = concatenate([x_concat,dense_1,dense_2])
 
