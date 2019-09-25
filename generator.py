@@ -25,7 +25,7 @@ class DataGenerator(keras.utils.Sequence):
         self.shuffle = shuffle
         self.resample = resample
 
-        self.resampler = SMOTE(random_state=42, k_neighbors=1)
+        self.resampler = RandomOverSampler(random_state=42)
 
         self.classes = classes
         self.n_classes = len(self.classes)

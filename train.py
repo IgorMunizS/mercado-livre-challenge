@@ -12,7 +12,7 @@ from sklearn.utils import class_weight
 import argparse
 import sys
 import numpy as np
-from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell, normalize_title
+from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell, normalize_title, remove_stopwords
 from utils.features import build_features
 from tqdm import tqdm
 tqdm.pandas()
@@ -32,12 +32,14 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             train_new = build_features(train_new)
             test_new = build_features(test_new)
 
-        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: remove_stopwords(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
-        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: remove_stopwords(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))

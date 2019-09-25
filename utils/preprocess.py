@@ -1,5 +1,6 @@
 import re
 import unicodedata
+from nltk.corpus import stopwords
 
 mispell_dict_pt = {'c/':'com',
                 's/':'sem',
@@ -150,3 +151,7 @@ def clean_text(x):
 def normalize_title(title):
     return unicodedata.normalize('NFKD', title.lower()).encode('ASCII', 'ignore').decode('utf8')
 
+def remove_stopwords(title,language):
+    cachedStopWords = stopwords.words(language)
+
+    return ' '.join([word for word in title.split() if word not in cachedStopWords])
