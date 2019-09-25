@@ -18,8 +18,6 @@ from tqdm import tqdm
 tqdm.pandas()
 from keras.preprocessing import sequence
 from utils.utils import label_smooth_loss
-from pandarallel import pandarallel
-pandarallel.initialize(shm_size_mb=10000, progress_bar=True, nb_workers=30)
 
 def training(languages, EMBEDDING,train,test,type_model,pre):
 
@@ -37,17 +35,17 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         stopwords = RemoveStopWords(lang)
 
-        train_new["title"] = train_new["title"].parallel_apply(lambda x: clean_numbers(x))
-        train_new["title"] = train_new["title"].parallel_apply(lambda x: stopwords.remove_stopwords(x, lang))
-        train_new["title"] = train_new["title"].parallel_apply(lambda x: replace_typical_misspell(x, lang))
-        train_new["title"] = train_new["title"].parallel_apply(lambda x: clean_text(x))
-        train_new["title"] = train_new["title"].parallel_apply(lambda x: normalize_title(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
+        train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
-        test_new["title"] = test_new["title"].parallel_apply(lambda x: clean_numbers(x))
-        test_new["title"] = test_new["title"].parallel_apply(lambda x: stopwords.remove_stopwords(x, lang))
-        test_new["title"] = test_new["title"].parallel_apply(lambda x: replace_typical_misspell(x, lang))
-        test_new["title"] = test_new["title"].parallel_apply(lambda x: clean_text(x))
-        test_new["title"] = test_new["title"].parallel_apply(lambda x: normalize_title(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
+        test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
 
 
 
