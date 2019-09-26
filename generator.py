@@ -18,7 +18,7 @@ class DataGenerator(keras.utils.Sequence):
         else:
             self.X = X[0]
             self.X_2 = X[1]
-            self.X_3 = X[2]
+            # self.X_3 = X[2]
 
         self.Y = Y
         self.batch_size = batch_size
@@ -48,9 +48,9 @@ class DataGenerator(keras.utils.Sequence):
         else:
             X_temp = [self.X[k] for k in indexes]
             X_temp_2 = [self.X_2[k] for k in indexes]
-            X_temp_3 = [self.X_3[k].toarray().ravel() for k in indexes]
+            # X_temp_3 = [self.X_3[k].toarray().ravel() for k in indexes]
 
-            X_temp = [X_temp, X_temp_2, X_temp_3]
+            X_temp = [X_temp, X_temp_2]
 
         Y_temp = [self.Y[k] for k in indexes]
         # Generate data
@@ -85,7 +85,7 @@ class DataGenerator(keras.utils.Sequence):
 
         else:
             if self.mode == 'three':
-                X = [np.array(X[0]), np.array(X[1]), np.array(X[2])]
+                X = [np.array(X[0]), np.array(X[1])]
             else:
                 X = np.array(X)
 

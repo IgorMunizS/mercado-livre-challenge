@@ -59,8 +59,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 120000
-        maxlen = 20
+        max_features = 30000
+        maxlen = 15
         embed_size = 300
         batch_size = 512
 
@@ -202,7 +202,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 model.layers[1].set_weights([embedding_matrix])
 
 
-            opt = Nadam(lr=0.001)
+            opt = RAdam(lr=0.001)
 
             model.compile(loss=label_smooth_loss, optimizer=opt, metrics=['accuracy'])
 
