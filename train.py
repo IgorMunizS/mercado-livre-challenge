@@ -59,7 +59,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 50000
+        max_features = 120000
         maxlen = 20
         embed_size = 300
         batch_size = 512
@@ -69,9 +69,9 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         char_vectorizer = CharVectorizer(max_features,text)
         char_embed_size = char_vectorizer.embed_size
 
-
-        hash_vectorizer = HashingVectorizer(n_features=max_features)
-        hash_vec_fitted = hash_vectorizer.fit(text)
+        #
+        # hash_vectorizer = HashingVectorizer(n_features=max_features)
+        # hash_vec_fitted = hash_vectorizer.fit(text)
 
 
 
@@ -79,11 +79,11 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             X_train = train_new[train_new['label_quality'] == 'reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
 
-            X_hash, X_hash_val, Y_hash, Y_hash_val = train_test_split(X_train, Y_train,
-                                                                      train_size=0.9, random_state=233)
+            # X_hash, X_hash_val, Y_hash, Y_hash_val = train_test_split(X_train, Y_train,
+            #                                                           train_size=0.9, random_state=233)
 
-            X_hash = hash_vec_fitted.transform(X_hash)
-            X_hash_val = hash_vec_fitted.transform(X_hash_val)
+            # X_hash = hash_vec_fitted.transform(X_hash)
+            # X_hash_val = hash_vec_fitted.transform(X_hash_val)
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
@@ -105,14 +105,14 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_3, X_hash], Y_train, classes, batch_size=batch_size,mode=type_model,resample=False)
-                val_generator = DataGenerator([X_val, X_val_3, X_hash_val], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=True)
+                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
 
             else:
 
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=False)
+                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=True)
                 val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size,resample=False)
 
             opt = Adam(lr=1e-3)
@@ -187,7 +187,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=False)
+                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=True)
                 val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
                 model.get_layer('embedding_layer').set_weights([embedding_matrix])
                 # model.get_layer('small_embedding_layer').set_weights([embedding_matrix])
@@ -196,7 +196,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233, stratify=Y_train)
 
-                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size,resample=False)
+                train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size,resample=True)
                 val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size, resample=False)
 
                 model.layers[1].set_weights([embedding_matrix])
@@ -252,9 +252,9 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size)
             val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size)
 
-            # opt = RAdam(lr=1e-3)
+            opt = RAdam(lr=1e-3)
             # opt = Nadam(lr=1e-3)
-            opt = Adam(lr=1e-3)
+            # opt = Adam(lr=1e-3)
             if type_model == 'colab':
                 model = get_small_model(maxlen, max_features, embed_size, embedding_matrix, len(classes))
             elif type_model == 'three':

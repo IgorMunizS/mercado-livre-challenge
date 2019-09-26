@@ -30,7 +30,8 @@ def emsemble(folder):
             if predict.split('.')[1] == 'pickle':
                 lang = predict.split('_')[0]
                 val_acc = predict.split('_')[1]
-                if val_acc > threshold[language]:
+                if float(val_acc) > threshold[language]:
+                    val_acc = float(val_acc)
                     val_acc += 1000 #give more weight to best models
 
                 if lang == language:
