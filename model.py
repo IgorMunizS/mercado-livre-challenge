@@ -72,6 +72,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     sequence_input = Input(shape=(maxlen,))
     # small_sequence_input = Input(shape=(6,))
     features_input = Input(shape=(20,))
+    hash_input = Input(shape=(120000,))
 
     embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=True, name='embedding_layer')(sequence_input)
 
@@ -130,7 +131,9 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
 
     features_dense = Dense(768, activation="relu")(features_input)
 
-    x = concatenate([max_pool1,max_pool2,max_pool3,max_pool4,x_concat_2,features_dense])
+    hash_dense = Dense(512,activation='relu')(hash_input)
+
+    x = concatenate([max_pool1,max_pool2,max_pool3,max_pool4,x_concat_2,features_dense,hash_dense])
 
     # x = concatenate([max_pool1, max_pool2,features_dense])
     # x = Dense(128, activation='relu')(concat)
