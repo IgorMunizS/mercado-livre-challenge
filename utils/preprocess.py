@@ -84,7 +84,14 @@ mispell_dict_pt = {'c/':'com',
                 'pçs':'peças',
                 'xxcm':'',
                 'cmxcm':'',
-                'xxmm': ''
+                'xxmm': '',
+                   ' cm ': ' centímetro ',
+                   ' mm ': ' milímetro ',
+                   ' m ' : ' metro ',
+                   ' kg ': ' kilograma ',
+                   ' km ': ' kilômetro ',
+                   ' g ' : ' gramas ',
+
                 }
 #
 mispell_dict_es = {'&':'y',
@@ -121,7 +128,7 @@ def clean_text(x):
 
     x = str(x)
     for punct in "/-'?!.,#$%\'()*+-/:;<=>@[\\]^_`{|}~`" + '""“”’' + '∞θ÷α•à−β∅³π‘₹´°£€\×™√²—–&':
-        x = x.replace(punct, '')
+        x = x.replace(punct, ' ')
     return x
 
 def normalize_title(title):

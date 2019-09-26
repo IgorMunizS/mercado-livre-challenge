@@ -18,6 +18,8 @@ from tqdm import tqdm
 tqdm.pandas()
 from keras.preprocessing import sequence
 from utils.utils import label_smooth_loss
+from sklearn.feature_extraction.text import HashingVectorizer
+
 
 def training(languages, EMBEDDING,train,test,type_model,pre):
 
@@ -37,13 +39,13 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
-        train_new["title"] = train_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
+        # train_new["title"] = train_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
         train_new["title"] = train_new["title"].progress_apply(lambda x: clean_text(x))
         train_new["title"] = train_new["title"].progress_apply(lambda x: normalize_title(x))
 
         test_new["title"] = test_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         # test_new["title"] = test_new["title"].progress_apply(lambda x: clean_numbers(x))
-        test_new["title"] = test_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
+        # test_new["title"] = test_new["title"].progress_apply(lambda x: stopwords.remove_stopwords(x, lang))
         test_new["title"] = test_new["title"].progress_apply(lambda x: clean_text(x))
         test_new["title"] = test_new["title"].progress_apply(lambda x: normalize_title(x))
 
@@ -68,10 +70,20 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
         char_embed_size = char_vectorizer.embed_size
 
 
+        hash_vectorizer = HashingVectorizer(n_features=max_features)
+        hash_vec_fitted = hash_vectorizer.fit(text)
+
+
+
         if pre:
             X_train = train_new[train_new['label_quality'] == 'reliable']['title']
             Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
 
+            X_hash, X_hash_val, Y_hash, Y_hash_val = train_test_split(X_train, Y_train,
+                                                                      train_size=0.9, random_state=233)
+
+            X_hash = hash_vec_fitted.transform(X_hash)
+            X_hash_val = hash_vec_fitted.transform(X_hash_val)
 
             tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
             glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size,lang)
@@ -93,8 +105,8 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
                 X_train, X_val, X_train_3, X_val_3, Y_train, Y_val = train_test_split(X_train, X_train_3, Y_train, train_size=0.9, random_state=233)
 
-                train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size,mode=type_model,resample=False)
-                val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
+                train_generator = DataGenerator([X_train, X_train_3, X_hash], Y_train, classes, batch_size=batch_size,mode=type_model,resample=False)
+                val_generator = DataGenerator([X_val, X_val_3, X_hash_val], Y_val, classes, batch_size=batch_size,mode=type_model, resample=False)
 
             else:
 
