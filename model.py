@@ -143,7 +143,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     # x = concatenate([concat, x])
 
     preds = Dense(n_classes, activation="softmax")(x)
-    model = Model(inputs=[sequence_input, features_input], outputs=preds)
+    model = Model(inputs=[sequence_input, features_input, hash_input], outputs=preds)
 
     return model
 
