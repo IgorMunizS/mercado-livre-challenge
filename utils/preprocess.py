@@ -87,9 +87,8 @@ mispell_dict_pt = {'c/':'com',
                 'xxmm': '',
                    ' cm ': ' centímetro ',
                    ' mm ': ' milímetro ',
-                   ' m ' : ' metro ',
-                   ' kg ': ' kilograma ',
-                   ' km ': ' kilômetro ',
+                   ' kg ': ' quilograma ',
+                   ' km ': ' quilômetro ',
                    ' g ' : ' gramas ',
 
                 }
@@ -98,7 +97,12 @@ mispell_dict_es = {'&':'y',
                 'n°':'',
                 '°':'',
                 '®':'',
-                'xxcm':''
+                'xxcm':'',
+                   ' cm ': ' centímetro ',
+                   ' mm ': ' milímetro ',
+                   ' kg ': ' kilogramo ',
+                   ' km ': ' kilómetro ',
+                   ' g ': ' gramos ',
                 }
 
 

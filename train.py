@@ -202,7 +202,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                 model.layers[1].set_weights([embedding_matrix])
 
 
-            opt = RAdam(lr=0.001)
+            opt = RAdam(lr=0.001, decay=0.000001)
 
             model.compile(loss=label_smooth_loss, optimizer=opt, metrics=['accuracy'])
 
