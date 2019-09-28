@@ -1,6 +1,7 @@
 from typing import Optional, List
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem import SnowballStemmer
+from gensim.models.fasttext import FastText as FT_gensim
 
 
 import numpy as np
@@ -411,6 +412,27 @@ def meta_embedding(tok,embedding_file,max_features,embed_size,lang):
         #     continue
 
         embedding_matrix[i] = unknown_vector
+    return embedding_matrix
+
+def generated_embedding(tok,max_features,embed_size,lang):
+    print("Gerando Fasttext Embedding")
+
+    loaded_model = FT_gensim.load('embedding/fasttext_' + lang + '.vec')
+
+    word_index = tok.word_index
+    # prepare embedding matrix
+    num_words = min(max_features, len(word_index) + 1)
+    embedding_matrix = np.zeros((num_words, embed_size))
+    unknown_vector = np.random.normal(size=embed_size)
+    # unknown_vector = np.zeros((embed_size,), dtype=np.float32) - 1.
+    # print(unknown_vector[:5])
+    for key, i in word_index.items():
+        if i >= max_features:
+            continue
+        word = key
+        embedding_vector = loaded_model[word]
+        embedding_matrix[i] = embedding_vector
+
     return embedding_matrix
 
 class CharVectorizer:

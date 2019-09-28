@@ -6,7 +6,7 @@ from keras_radam import RAdam
 from generator import DataGenerator
 from model import get_model, get_small_model, get_three_entrys_model
 from utils.tokenizer import tokenize, save_multi_inputs
-from utils.embeddings import meta_embedding, CharVectorizer
+from utils.embeddings import meta_embedding, CharVectorizer, generated_embedding
 from utils.callbacks import Lookahead, CyclicLR
 from sklearn.utils import class_weight
 import argparse
@@ -113,18 +113,19 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     word_index = tok.word_index
     # prepare embedding matrix
-    max_features = min(max_features, len(word_index) + 1)
-
+    # max_features = min(max_features, len(word_index) + 1)
+    max_features = len(word_index)
     # glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size, lang)
-    fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
+    # fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
+    generated_fast_embedding_matrix = generated_embedding(tok,max_features,embed_size,lang)
 
     char_embedding = char_vectorizer.get_char_embedding(tok)
 
     # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
-    # embedding_matrix = np.concatenate((glove_embedding_matrix, fast_embedding_matrix, char_embedding), axis=1)
+    # embedding_matrix = np.concatenate((generated_fast_embedding_matrix, fast_embedding_matrix), axis=1)
 
-    embedding_matrix = fast_embedding_matrix
+    embedding_matrix = generated_fast_embedding_matrix
 
     # class_weights = class_weight.compute_class_weight('balanced',
     #                                                   classes,

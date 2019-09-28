@@ -74,7 +74,7 @@ def get_three_entrys_model(maxlen, max_features,embed_size,embedding_matrix,n_cl
     features_input = Input(shape=(20,))
     # hash_input = Input(shape=(max_features,))
 
-    embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=True, name='embedding_layer')(sequence_input)
+    embedding_1 = Embedding(max_features, embed_size, weights=[embedding_matrix], trainable=False, name='embedding_layer')(sequence_input)
 
     # x = SpatialDropout1D(0.3)(embedding_1)
     # x1 = Bidirectional(CuDNNLSTM(256, return_sequences=True))(x)
