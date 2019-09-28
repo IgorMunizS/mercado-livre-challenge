@@ -103,7 +103,7 @@ def __pretraining(train_new,X_test,max_features,EMBEDDING,embed_size,maxlen,lang
     return model
 
 
-def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
+def __training(train_new,X_test,max_features,maxlen,EMBEDDING,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
                batch_size,model=None):
     X_train = train_new['title']
 
