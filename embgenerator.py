@@ -4,6 +4,8 @@ import pandas as pd
 from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell, normalize_title, RemoveStopWords
 from tqdm import tqdm
 tqdm.pandas()
+from gensim.models.fasttext import FastText as FT_gensim
+from gensim.test.utils import datapath
 
 def get_sentences(train,test,lang):
     train_new = train[train["language"] == lang]
@@ -33,6 +35,22 @@ def generate_corpus(sentences,name):
         for sentence in tqdm(sentences):
             f.write(sentence + '\n')
 
+def generate_model(lang):
+
+    corpus_file = datapath('embedding/corpus_' + 'lang')
+
+    model_gensim = FT_gensim(size=300)
+
+    # build the vocabulary
+    model_gensim.build_vocab(corpus_file=corpus_file)
+
+    # train the model
+    model_gensim.train(
+        corpus_file=corpus_file, epochs=model_gensim.epochs,
+        total_examples=model_gensim.corpus_count, total_words=model_gensim.corpus_total_words
+    )
+
+    model_gensim.save('embedding/fasttext_' + lang + '.vec')
 
 def parse_args(args):
     """ Parse the arguments.
@@ -62,3 +80,7 @@ if __name__ == '__main__':
         for lang in languages:
             sentences = get_sentences(train,test,lang)
             generate_corpus(sentences,lang)
+
+    if args.task == 'model':
+        for lang in languages:
+            generate_model(lang)
