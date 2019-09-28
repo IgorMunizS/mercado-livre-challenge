@@ -2,7 +2,8 @@ import argparse
 import sys
 import pandas as pd
 from utils.preprocess import clean_numbers, clean_text, replace_typical_misspell, normalize_title, RemoveStopWords
-
+from tqdm import tqdm
+tqdm.pandas()
 
 def get_sentences(train,test,lang):
     train_new = train[train["language"] == lang][:10]
