@@ -20,7 +20,7 @@ from keras.preprocessing import sequence
 from utils.utils import label_smooth_loss
 from sklearn.feature_extraction.text import HashingVectorizer
 
-def __pretraining(train_new,X_test,max_features,embed_size,maxlen,lang,char_vectorizer,type_model,classes,
+def __pretraining(train_new,X_test,max_features,EMBEDDING,embed_size,maxlen,lang,char_vectorizer,type_model,classes,
                  batch_size,char_embed_size):
     X_train = train_new[train_new['label_quality'] == 'reliable']['title']
     Y_train = train_new[train_new['label_quality'] == 'reliable']['category'].values
@@ -103,7 +103,7 @@ def __pretraining(train_new,X_test,max_features,embed_size,maxlen,lang,char_vect
     return model
 
 
-def __training(train_new,X_test,max_features,maxlen,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
+def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
                batch_size,model=None):
     X_train = train_new['title']
 
@@ -263,14 +263,14 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         if pre:
 
-            pre_model = __pretraining(train_new,X_test,max_features,embed_size,maxlen,lang,char_vectorizer,
+            pre_model = __pretraining(train_new,X_test,max_features,EMBEDDING,embed_size,maxlen,lang,char_vectorizer,
                                  type_model,classes,batch_size,char_embed_size)
 
-            __training(train_new,X_test,max_features,maxlen,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
+            __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
                batch_size,model=pre_model)
 
         else:
-            __training(train_new,X_test,max_features,maxlen,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
+            __training(train_new,X_test,max_features,maxlen,EMBEDDING,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
                batch_size,model=None)
 
 
