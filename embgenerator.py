@@ -37,16 +37,15 @@ def generate_corpus(sentences,name):
 
 def generate_model(lang):
 
-    corpus_file = datapath('embedding/corpus_' + 'lang')
 
     model_gensim = FT_gensim(size=300)
 
     # build the vocabulary
-    model_gensim.build_vocab(corpus_file=corpus_file)
+    model_gensim.build_vocab(corpus_file='embedding/corpus_' + lang)
 
     # train the model
     model_gensim.train(
-        corpus_file=corpus_file, epochs=model_gensim.epochs,
+        corpus_file='embedding/corpus_' + lang, epochs=model_gensim.epochs,
         total_examples=model_gensim.corpus_count, total_words=model_gensim.corpus_total_words
     )
 
