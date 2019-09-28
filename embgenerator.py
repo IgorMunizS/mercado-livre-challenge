@@ -31,6 +31,7 @@ def generate_corpus(sentences,name):
 
     with open('embedding/corpus_' + name, 'w') as f:
         for sentence in sentences:
+            print(sentence)
             f.write('\n'.join(sentence))
 
 
