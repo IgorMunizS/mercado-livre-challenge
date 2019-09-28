@@ -89,9 +89,9 @@ mispell_dict_pt = {'c/':'com',
                    ' mm ': ' milímetro ',
                    ' kg ': ' quilograma ',
                    ' km ': ' quilômetro ',
-                   ' frete ': ' ',
-                   ' grátis ': ' ',
-                   ' gratis ': ' ',
+                   'frete': '',
+                   'grátis': '',
+                   'gratis': '',
 
                 }
 #

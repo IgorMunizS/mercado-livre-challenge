@@ -113,8 +113,8 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     word_index = tok.word_index
     # prepare embedding matrix
-    # max_features = min(max_features, len(word_index) + 1)
-    max_features = len(word_index)
+    max_features = min(max_features, len(word_index) + 1)
+    # max_features = len(word_index)
     # glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size, lang)
     # fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
     generated_fast_embedding_matrix = generated_embedding(tok,max_features,embed_size,lang)
@@ -252,7 +252,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 600000
+        max_features = 500000
         maxlen = 20
         embed_size = 300
         batch_size = 512
