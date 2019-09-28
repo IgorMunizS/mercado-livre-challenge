@@ -40,6 +40,7 @@ def parse_args(args):
 
     parser.add_argument('--task', help='Type of task to execute', default='corpus')
     parser.add_argument('--language', help='Training only in a specific language', default='both')
+    parser.add_argument('--data_folder', default='../../dados/')
 
     return parser.parse_args(args)
 
