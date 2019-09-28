@@ -103,13 +103,18 @@ def __pretraining(train_new,X_test,max_features,EMBEDDING,embed_size,maxlen,lang
     return model
 
 
-def __training(train_new,X_test,max_features,maxlen,EMBEDDING,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
+def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
                batch_size,model=None):
     X_train = train_new['title']
 
     Y_train = train_new['category'].values
 
     tok, X_train = tokenize(X_train, X_test, max_features, maxlen, lang)
+
+    word_index = tok.word_index
+    # prepare embedding matrix
+    max_features = min(max_features, len(word_index) + 1)
+
     # glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size, lang)
     fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
 
@@ -271,7 +276,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
                batch_size,model=pre_model)
 
         else:
-            __training(train_new,X_test,max_features,maxlen,EMBEDDING,lang,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
+            __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,char_vectorizer, char_embed_size,classes,type_model,test_new,
                batch_size,model=None)
 
 
