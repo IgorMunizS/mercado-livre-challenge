@@ -6,8 +6,8 @@ from tqdm import tqdm
 tqdm.pandas()
 
 def get_sentences(train,test,lang):
-    train_new = train[train["language"] == lang][:10]
-    test_new = test[test["language"] == lang][:10]
+    train_new = train[train["language"] == lang]
+    test_new = test[test["language"] == lang]
 
     train_new['title'] = train_new['title'].str.lower()
     test_new['title'] = test_new['title'].str.lower()
@@ -30,8 +30,7 @@ def get_sentences(train,test,lang):
 def generate_corpus(sentences,name):
 
     with open('embedding/corpus_' + name, 'w') as f:
-        for sentence in sentences:
-            print(sentence)
+        for sentence in tqdm(sentences):
             f.write(sentence + '\n')
 
 
