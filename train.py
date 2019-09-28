@@ -121,9 +121,9 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     embedding_matrix = fast_embedding_matrix
 
-    class_weights = class_weight.compute_class_weight('balanced',
-                                                      classes,
-                                                      Y_train)
+    # class_weights = class_weight.compute_class_weight('balanced',
+    #                                                   classes,
+    #                                                   Y_train)
 
     if model is None:
         if type_model == 'small':
@@ -156,7 +156,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
                                                                               train_size=0.9, random_state=233)
 
         train_generator = DataGenerator([X_train, X_train_3], Y_train, classes, batch_size=batch_size, mode=type_model,
-                                        resample=False)
+                                        resample=True)
         val_generator = DataGenerator([X_val, X_val_3], Y_val, classes, batch_size=batch_size, mode=type_model,
                                       resample=False)
         model.get_layer('embedding_layer').set_weights([embedding_matrix])
@@ -167,7 +167,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, train_size=0.9, random_state=233,
                                                           stratify=Y_train)
 
-        train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=False)
+        train_generator = DataGenerator(X_train, Y_train, classes, batch_size=batch_size, resample=True)
         val_generator = DataGenerator(X_val, Y_val, classes, batch_size=batch_size, resample=False)
 
         model.layers[1].set_weights([embedding_matrix])
@@ -182,7 +182,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
     filepath = '../models/' + lang + '_model_{epoch:02d}_{val_acc:.4f}.h5'
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
                                  save_weights_only=False)
-    early = EarlyStopping(monitor="val_loss", mode="min", patience=3)
+    early = EarlyStopping(monitor="val_acc", mode="max", patience=3)
 
     clr = CyclicLR(base_lr=0.0003, max_lr=0.001,
                    step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
@@ -208,7 +208,6 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
     model.fit_generator(generator=train_generator,
                         validation_data=val_generator,
                         callbacks=callbacks_list,
-                        class_weight=class_weights,
                         epochs=50,
                         use_multiprocessing=True,
                         workers=42)
