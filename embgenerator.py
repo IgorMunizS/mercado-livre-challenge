@@ -29,7 +29,7 @@ def get_sentences(train,test,lang):
 
 def generate_corpus(sentences,name):
 
-    with open('embedding/corpus_' + name) as f:
+    with open('embedding/corpus_' + name, 'w') as f:
         for sentence in sentences:
             f.write('\n'.join(sentence))
 
