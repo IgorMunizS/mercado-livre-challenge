@@ -5,7 +5,7 @@ import sys
 import argparse
 import time
 
-def emsemble(folder):
+def emsemble(folder, mode):
 
     predictions = [f for f in os.listdir(folder) if os.path.isfile(folder + f)]
     print(predictions)
@@ -30,6 +30,9 @@ def emsemble(folder):
             if predict.split('.')[1] == 'pickle':
                 lang = predict.split('_')[0]
                 val_acc = predict.split('_')[1]
+
+                if mode == 'average':
+                    val_acc = 1
 
 
                 if lang == language:
@@ -65,6 +68,7 @@ def parse_args(args):
 
 
     parser.add_argument('--folder', help='Path to pickle predictions', default='predictions/')
+    parser.add_argument('--mode', help='Type of emsemble', default='weighted average')
 
 
     return parser.parse_args(args)

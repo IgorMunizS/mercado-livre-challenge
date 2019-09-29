@@ -115,17 +115,17 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
     # prepare embedding matrix
     max_features = min(max_features, len(word_index) + 1)
     # max_features = len(word_index)
-    # glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size, lang)
-    # fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
+    glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size, lang)
+    fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
     generated_fast_embedding_matrix = generated_embedding(tok,max_features,embed_size,lang)
 
-    char_embedding = char_vectorizer.get_char_embedding(tok)
+    # char_embedding = char_vectorizer.get_char_embedding(tok)
 
     # embedding_matrix = np.mean([glove_embedding_matrix, fast_embedding_matrix], axis=0)
 
-    # embedding_matrix = np.concatenate((generated_fast_embedding_matrix, fast_embedding_matrix), axis=1)
+    embedding_matrix = np.concatenate((generated_fast_embedding_matrix, fast_embedding_matrix, glove_embedding_matrix), axis=1)
 
-    embedding_matrix = generated_fast_embedding_matrix
+    # embedding_matrix = generated_fast_embedding_matrix
 
     # class_weights = class_weight.compute_class_weight('balanced',
     #                                                   classes,
@@ -137,7 +137,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
                                     len(classes))
 
         elif type_model == 'three':
-            model = get_three_entrys_model(maxlen, max_features, embed_size, embedding_matrix,
+            model = get_three_entrys_model(maxlen, max_features, 3 * embed_size, embedding_matrix,
                                            len(classes))
 
         else:
@@ -194,7 +194,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
                    step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
 
     reduce_lr = ReduceLROnPlateau(
-        monitor='val_acc',
+        monitor='val_loss',
         factor=0.3,
         patience=1,
         verbose=1,
@@ -206,8 +206,8 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     callbacks_list = [checkpoint, early, reduce_lr]
 
-    # lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
-    # lookahead.inject(model)
+    lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
+    lookahead.inject(model)
 
     print("Treinando")
 
@@ -252,7 +252,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
         X_test = test_new["title"]
 
-        max_features = 500000
+        max_features = 300000
         maxlen = 20
         embed_size = 300
         batch_size = 512
