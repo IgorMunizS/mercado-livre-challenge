@@ -11,6 +11,23 @@ import tensorflow as tf
 # 		return -K.mean(alpha * K.pow(1. - pt_1, gamma) * K.log(pt_1)) - K.mean((1 - alpha) * K.pow(pt_0, gamma) * K.log(1. - pt_0))
 # 	return focal_loss_fixed
 
+
+class PolynomialDecay():
+    def __init__(self, maxEpochs=100, initAlpha=0.01, power=1.0):
+        # store the maximum number of epochs, base learning rate,
+        # and power of the polynomial
+        self.maxEpochs = maxEpochs
+        self.initAlpha = initAlpha
+        self.power = power
+
+    def __call__(self, epoch):
+        # compute the new learning rate based on polynomial decay
+        decay = (1 - (epoch / float(self.maxEpochs))) ** self.power
+        alpha = self.initAlpha * decay
+
+        # return the new learning rate
+        return float(alpha)
+
 def focal_loss(y_true, y_pred):
     gamma = 2.0
     alpha = 0.25

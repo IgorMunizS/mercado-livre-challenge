@@ -1,5 +1,5 @@
 import pandas as pd
-from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
+from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau, LearningRateScheduler
 from keras.optimizers import Adam, Nadam
 from sklearn.model_selection import train_test_split
 from keras_radam import RAdam
@@ -17,7 +17,7 @@ from utils.features import build_features
 from tqdm import tqdm
 tqdm.pandas()
 from keras.preprocessing import sequence
-from utils.utils import label_smooth_loss
+from utils.utils import label_smooth_loss, PolynomialDecay
 from sklearn.feature_extraction.text import HashingVectorizer
 
 def __pretraining(train_new,X_test,max_features,EMBEDDING,embed_size,maxlen,lang,char_vectorizer,type_model,classes,
@@ -127,9 +127,9 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     # embedding_matrix = generated_fast_embedding_matrix
 
-    # class_weights = class_weight.compute_class_weight('balanced',
-    #                                                   classes,
-    #                                                   Y_train)
+    class_weights = class_weight.compute_class_weight('balanced',
+                                                      classes,
+                                                      Y_train)
 
     if model is None:
         if type_model == 'small':
@@ -180,7 +180,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
 
 
-    opt = RAdam(lr=0.001)
+    opt = RAdam(lr=0.01)
 
     model.compile(loss=label_smooth_loss, optimizer=opt, metrics=['accuracy'])
 
@@ -189,6 +189,10 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=False, mode='max',
                                  save_weights_only=False)
     early = EarlyStopping(monitor="val_acc", mode="max", patience=3)
+
+    schedule = PolynomialDecay(maxEpochs=12, initAlpha=1e-1, power=1)
+
+    lr_schedule = LearningRateScheduler(schedule)
 
     clr = CyclicLR(base_lr=0.0003, max_lr=0.001,
                    step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
@@ -204,7 +208,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
         min_lr=0
     )
 
-    callbacks_list = [checkpoint, early, reduce_lr]
+    callbacks_list = [checkpoint, early, lr_schedule, reduce_lr]
 
     lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
     lookahead.inject(model)
@@ -213,6 +217,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     model.fit_generator(generator=train_generator,
                         validation_data=val_generator,
+                        class_weigh=class_weights,
                         callbacks=callbacks_list,
                         epochs=50,
                         use_multiprocessing=True,
