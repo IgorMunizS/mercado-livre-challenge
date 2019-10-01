@@ -217,7 +217,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     model.fit_generator(generator=train_generator,
                         validation_data=val_generator,
-                        class_weigth=class_weights,
+                        class_weight=class_weights,
                         callbacks=callbacks_list,
                         epochs=50,
                         use_multiprocessing=True,
