@@ -106,6 +106,27 @@ mispell_dict_es = {'&':'y',
                    ' km ': ' kilómetro ',
                 }
 
+mispell_dict_all = {'&':'y',
+                'n°':'',
+                '°':'',
+                '®':'',
+                'xxcm':'',
+                'c/':'com',
+                's/':'sem',
+                'p/':'para',
+                '1/2':'meio',
+                '1/4':'um quarto',
+                'pçs':'peças',
+                'cmxcm':'',
+                'xxmm': '',
+                   ' cm ': ' centímetro ',
+                   ' mm ': ' milímetro ',
+                   ' kg ': ' quilograma ',
+                   ' km ': ' quilômetro ',
+                   'frete': '',
+                   'grátis': '',
+                   'gratis': '',
+                }
 
 def clean_numbers(x):
 
@@ -120,8 +141,10 @@ def _get_mispell(mispell_dict):
 def replace_typical_misspell(text, language):
     if language == 'portuguese':
         mispellings, mispellings_re = _get_mispell(mispell_dict_pt)
-    else:
+    elif language == 'spanish':
         mispellings, mispellings_re = _get_mispell(mispell_dict_es)
+    else:
+        mispellings, mispellings_re = _get_mispell(mispell_dict_all)
 
 
     def replace(match):

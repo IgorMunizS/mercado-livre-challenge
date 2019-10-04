@@ -117,7 +117,15 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
     # max_features = len(word_index)
     # glove_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][0], max_features, embed_size, lang)
     # fast_embedding_matrix = meta_embedding(tok, EMBEDDING[lang][1], max_features, embed_size, lang)
-    generated_fast_embedding_matrix = generated_embedding(tok,max_features,embed_size,lang)
+
+    if lang == 'all':
+        generated_fast_embedding_matrix = generated_embedding(tok,max_features,embed_size,'portuguese')
+        generated_fast_embedding_matrix2 = generated_embedding(tok,max_features,embed_size,'spanish')
+        embedding_matrix = np.concatenate((generated_fast_embedding_matrix, generated_fast_embedding_matrix2), axis=1)
+        embed_size = 2* embed_size
+    else:
+        generated_fast_embedding_matrix = generated_embedding(tok,max_features,embed_size,'portuguese')
+        embedding_matrix = generated_fast_embedding_matrix
 
     # char_embedding = char_vectorizer.get_char_embedding(tok)
 
@@ -125,7 +133,6 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
 
     # embedding_matrix = np.concatenate((generated_fast_embedding_matrix, fast_embedding_matrix, glove_embedding_matrix), axis=1)
 
-    embedding_matrix = generated_fast_embedding_matrix
 
     class_weights = class_weight.compute_class_weight('balanced',
                                                       classes,
@@ -229,8 +236,13 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
 
     for lang in languages:
         print('Training ',lang)
-        train_new = train[train["language"] == lang]
-        test_new = test[test["language"] == lang]
+
+        if lang == 'all':
+            train_new = train
+            test_new = test
+        else:
+            train_new = train[train["language"] == lang]
+            test_new = test[test["language"] == lang]
 
         train_new['title'] = train_new['title'].str.lower()
         test_new['title'] = test_new['title'].str.lower()
@@ -239,7 +251,7 @@ def training(languages, EMBEDDING,train,test,type_model,pre):
             train_new = build_features(train_new)
             test_new = build_features(test_new)
 
-        stopwords = RemoveStopWords(lang)
+        # stopwords = RemoveStopWords(lang)
 
         train_new["title"] = train_new["title"].progress_apply(lambda x: replace_typical_misspell(x, lang))
         # train_new["title"] = train_new["title"].progress_apply(lambda x: clean_numbers(x))
@@ -295,7 +307,7 @@ def parse_args(args):
     parser.add_argument('--model', help='Local of training', default='normal')
     parser.add_argument('--pre', help='Pretraining with only reliable values', default=False, type=bool)
     parser.add_argument('--small_set', default=False, type=bool)
-    parser.add_argument('--language', help='Training only in a specific language', default='both')
+    parser.add_argument('--language', help='Training only in a specific language', default='all')
     parser.add_argument('--data_folder', default='../../dados/')
     parser.add_argument('--embedding_folder', default='../../../harold/word_embeddings/')
 
