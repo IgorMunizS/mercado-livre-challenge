@@ -197,9 +197,9 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
                                  save_weights_only=False)
     early = EarlyStopping(monitor="val_acc", mode="max", patience=3)
 
-    schedule = PolynomialDecay(maxEpochs=12, initAlpha=1e-1, power=1)
+    # schedule = PolynomialDecay(maxEpochs=12, initAlpha=1e-1, power=1)
 
-    lr_schedule = LearningRateScheduler(schedule)
+    # lr_schedule = LearningRateScheduler(schedule)
 
     clr = CyclicLR(base_lr=0.0003, max_lr=0.001,
                    step_size=35000, reduce_on_plateau=1, monitor='val_loss', reduce_factor=10)
@@ -215,7 +215,7 @@ def __training(train_new,X_test,max_features,maxlen,lang,EMBEDDING,embed_size,ch
         min_lr=0
     )
 
-    callbacks_list = [checkpoint, early, lr_schedule, reduce_lr]
+    callbacks_list = [checkpoint, early, reduce_lr]
 
     lookahead = Lookahead(k=5, alpha=0.5)  # Initialize Lookahead
     lookahead.inject(model)
